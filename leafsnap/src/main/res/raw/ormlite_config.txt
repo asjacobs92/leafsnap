@@ -1,0 +1,208 @@
+#
+# generated on 2014/06/10 10:47:53
+#
+# --table-start--
+dataClass=edu.maryland.leafsnap.model.CollectedLeaf
+tableName=collectedleaf
+# --table-fields-start--
+# --field-start--
+fieldName=id
+generatedId=true
+# --field-end--
+# --field-start--
+fieldName=leafID
+# --field-end--
+# --field-start--
+fieldName=altitude
+# --field-end--
+# --field-start--
+fieldName=latitude
+# --field-end--
+# --field-start--
+fieldName=longitude
+# --field-end--
+# --field-start--
+fieldName=uploaded
+# --field-end--
+# --field-start--
+fieldName=collectedDate
+dataPersister=DATE_STRING
+# --field-end--
+# --field-start--
+fieldName=lastModified
+dataPersister=DATE_STRING
+# --field-end--
+# --field-start--
+fieldName=syncStatus
+# --field-end--
+# --field-start--
+fieldName=selectedSpeciesRel
+foreign=true
+foreignAutoCreate=true
+# --field-end--
+# --field-start--
+fieldName=originalImageURL
+foreign=true
+foreignAutoCreate=true
+# --field-end--
+# --field-start--
+fieldName=segmentedImageURL
+foreign=true
+foreignAutoCreate=true
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
+# --table-start--
+dataClass=edu.maryland.leafsnap.model.DatabaseInfo
+tableName=databaseinfo
+# --table-fields-start--
+# --field-start--
+fieldName=id
+generatedId=true
+# --field-end--
+# --field-start--
+fieldName=version
+# --field-end--
+# --field-start--
+fieldName=fullyLoaded
+# --field-end--
+# --field-start--
+fieldName=lastUpdate
+dataPersister=DATE_STRING
+version=true
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
+# --table-start--
+dataClass=edu.maryland.leafsnap.model.LeafletUrl
+tableName=leafleturl
+# --table-fields-start--
+# --field-start--
+fieldName=id
+generatedId=true
+# --field-end--
+# --field-start--
+fieldName=order
+# --field-end--
+# --field-start--
+fieldName=rawURL
+# --field-end--
+# --field-start--
+fieldName=type
+# --field-end--
+# --field-start--
+fieldName=dataSource
+# --field-end--
+# --field-start--
+fieldName=thumbnailLocation
+# --field-end--
+# --field-start--
+fieldName=hiResImageLocation
+# --field-end--
+# --field-start--
+fieldName=associatedSpecies
+foreign=true
+foreignAutoRefresh=true
+# --field-end--
+# --field-start--
+fieldName=revExampleImageLeaf
+foreign=true
+# --field-end--
+# --field-start--
+fieldName=revExampleImageFlower
+foreign=true
+# --field-end--
+# --field-start--
+fieldName=revExampleImageFruit
+foreign=true
+# --field-end--
+# --field-start--
+fieldName=revOriginalImageURL
+foreign=true
+# --field-end--
+# --field-start--
+fieldName=revSegmentedImageURL
+foreign=true
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
+# --table-start--
+dataClass=edu.maryland.leafsnap.model.RankedSpecies
+tableName=rankedspecies
+# --table-fields-start--
+# --field-start--
+fieldName=id
+generatedId=true
+# --field-end--
+# --field-start--
+fieldName=rank
+# --field-end--
+# --field-start--
+fieldName=species
+foreign=true
+# --field-end--
+# --field-start--
+fieldName=associatedCollection
+foreign=true
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################
+# --table-start--
+dataClass=edu.maryland.leafsnap.model.Species
+tableName=species
+# --table-fields-start--
+# --field-start--
+fieldName=id
+generatedId=true
+# --field-end--
+# --field-start--
+fieldName=dataset
+# --field-end--
+# --field-start--
+fieldName=popularName
+unique=true
+# --field-end--
+# --field-start--
+fieldName=description
+# --field-end--
+# --field-start--
+fieldName=scientificName
+unique=true
+# --field-end--
+# --field-start--
+fieldName=habitat
+# --field-end--
+# --field-start--
+fieldName=bloom
+# --field-end--
+# --field-start--
+fieldName=growth
+# --field-end--
+# --field-start--
+fieldName=longevity
+# --field-end--
+# --field-start--
+fieldName=presence
+# --field-end--
+# --field-start--
+fieldName=exampleImageFlower
+foreign=true
+foreignAutoRefresh=true
+# --field-end--
+# --field-start--
+fieldName=exampleImageLeaf
+foreign=true
+foreignAutoRefresh=true
+# --field-end--
+# --field-start--
+fieldName=exampleImageFruit
+foreign=true
+foreignAutoRefresh=true
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################

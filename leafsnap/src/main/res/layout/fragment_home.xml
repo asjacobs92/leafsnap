@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:columnCount="3"
+    android:gravity="center_vertical"
+    android:orientation="vertical" >
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="@dimen/logo_width"
+        android:layout_height="@dimen/logo_height"
+        android:layout_centerHorizontal="true"
+        android:contentDescription="@string/logo_description"
+        android:scaleType="fitCenter"
+        android:src="@drawable/leafsnap_logo" />
+
+    <ImageView
+        android:id="@+id/rand_thumb"
+        android:layout_width="@dimen/rand_thumbnail_width"
+        android:layout_height="@dimen/rand_thumbnail_height"
+        android:layout_below="@+id/logo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="@dimen/rand_thumb_margin_bottom"
+        android:layout_marginTop="@dimen/rand_thumb_margin_top"
+        android:adjustViewBounds="false"
+        android:clickable="false"
+        android:contentDescription="@string/rand_thumb_description"
+        android:scaleType="fitCenter"
+        android:src="@drawable/sakura" />
+    
+     <TextView
+        android:id="@+id/rand_thumb_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/rand_thumb"
+        android:layout_centerHorizontal="true"
+        android:textColor="@color/white" />
+
+</RelativeLayout>

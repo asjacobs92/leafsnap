@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE xml>
+<resources>
+
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="tab_title">10sp</dimen>
+    <dimen name="logo_height">100dp</dimen>
+    <dimen name="logo_width">200dp</dimen>
+    <dimen name="rand_thumbnail_width">230dp</dimen>
+    <dimen name="rand_thumbnail_height">230dp</dimen>
+    <dimen name="rand_thumb_margin_top">40dp</dimen>
+    <dimen name="rand_thumb_margin_bottom">10dp</dimen>
+    <dimen name="species_details_padding_top">20dp</dimen>
+    <dimen name="species_details_padding_left">10dp</dimen>
+
+</resources>

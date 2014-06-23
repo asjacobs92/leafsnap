@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="leafsnap_grey">#DBD6D2</color>
+    <color name="leafsnap_green">#91AF00</color>
+    <color name="white_overlay">#22FFFFFF</color>
+    <color name="list_header_grey">#4D4D4D</color>
+    <color name="default_color">#111</color>
+
+</resources>

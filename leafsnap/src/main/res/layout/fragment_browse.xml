@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE LinearLayout>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <EditText
+        android:id="@+id/search_species"
+        style="@style/EditText.Leafsnap"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:drawableRight="@android:drawable/ic_menu_search"
+        android:hint="@string/search_view_hint"
+        android:textCursorDrawable="@null" >
+    </EditText>
+
+    <se.emilsjolander.stickylistheaders.StickyListHeadersListView
+        android:id="@+id/species_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:drawSelectorOnTop="false"
+        android:divider="@drawable/listview_divider">
+    </se.emilsjolander.stickylistheaders.StickyListHeadersListView>
+</LinearLayout>

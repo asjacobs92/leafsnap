@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name" translatable="false">Leafsnap</string>
+    <string name="title_home_tab" translatable="false">Home</string>
+    <string name="title_browse_tab" translatable="false">Browse</string>
+    <string name="title_collection_tab" translatable="false">Collection</string>
+    <string name="title_options_tab" translatable="false">Options</string>
+    <string name="title_camera_tab" translatable="false">Snap it!</string>
+    <string name="action_about" translatable="false">About</string>
+    <string name="action_help" translatable="false">Help</string>
+    <string name="tab_icon_description" translatable="false">Tab icon.</string>
+    <string name="logo_description" translatable="false">Applciation logo.</string>
+    <string name="thumb_description" translatable="false">Thumbnail in species list item.</string>
+    <string name="rand_thumb_description" translatable="false">Thumbnail displaying random species.</string>
+    <string name="search_view_hint" translatable="false">Search</string>
+    <string name="todo" translatable="false">TODO!</string>
+    <string name="title_activity_species_details_acitivity">SpeciesDetailsAcitivity</string>
+    <string name="hide_picker_text">Tap large image to hide toolbar.</string>
+    <string name="species_commom_name">Commom name</string>
+    <string name="species_scientific_name">Scientific name</string>
+    <string name="species_description">Description</string>
+    <string name="species_habitat">Habitat:</string>
+    <string name="species_growth">Growth habit:</string>
+    <string name="species_bloom">Bloom time:</string>
+    <string name="species_presence">Presence in the US:</string>
+    <string name="species_longevity">Longevity: </string>
+
+</resources>

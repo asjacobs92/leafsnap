@@ -1,0 +1,47 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/black"
+            android:fitsSystemWindows="true"
+            tools:context="edu.maryland.leafsnap.activity.SpeciesAcitivity">
+
+    <LinearLayout
+        android:id="@+id/details_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/commom_name"
+            android:text="@string/species_commom_name"
+            android:textStyle="bold"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/white"
+            android:paddingTop="@dimen/species_details_padding_top"
+            android:paddingLeft="@dimen/species_details_padding_left"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/scientific_name"
+            android:text="@string/species_scientific_name"
+            android:textStyle="italic"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:paddingLeft="@dimen/species_details_padding_left"
+            android:textColor="@color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/description"
+            android:text="@string/species_description"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/leafsnap_grey"
+            android:paddingLeft="@dimen/species_details_padding_left"
+            android:paddingTop="@dimen/species_details_padding_top"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+</ScrollView>
