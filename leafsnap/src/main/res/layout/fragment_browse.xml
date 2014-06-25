@@ -6,8 +6,8 @@
     android:orientation="vertical" >
 
     <EditText
-        android:id="@+id/search_species"
         style="@style/EditText.Leafsnap"
+        android:id="@+id/search_species"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:drawableRight="@android:drawable/ic_menu_search"
@@ -18,8 +18,10 @@
     <se.emilsjolander.stickylistheaders.StickyListHeadersListView
         android:id="@+id/species_list"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:drawSelectorOnTop="false"
-        android:divider="@drawable/listview_divider">
+        android:layout_height="match_parent"
+        android:drawSelectorOnTop="true"
+        android:fastScrollEnabled="true"
+        android:divider="@drawable/listview_divider"
+        android:listSelector="@drawable/listview_selector">
     </se.emilsjolander.stickylistheaders.StickyListHeadersListView>
 </LinearLayout>

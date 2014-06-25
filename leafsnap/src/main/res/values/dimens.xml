@@ -14,5 +14,7 @@
     <dimen name="rand_thumb_margin_bottom">10dp</dimen>
     <dimen name="species_details_padding_top">20dp</dimen>
     <dimen name="species_details_padding_left">10dp</dimen>
+    <dimen name="options_button_width">300dp</dimen>
+    <dimen name="options_button_height">65dp</dimen>
 
 </resources>

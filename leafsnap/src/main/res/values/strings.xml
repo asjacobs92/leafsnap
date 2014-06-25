@@ -25,5 +25,12 @@
     <string name="species_bloom">Bloom time:</string>
     <string name="species_presence">Presence in the US:</string>
     <string name="species_longevity">Longevity: </string>
+    <string name="option_account">Account</string>
+    <string name="option_photo_size">Photo upload size</string>
+    <string name="option_database">Database</string>
+    <string name="current_user">Current user:</string>
+    <string name="username">username</string>
+    <string name="current_version">Current version:</string>
+    <string name="version">1</string>
 
 </resources>

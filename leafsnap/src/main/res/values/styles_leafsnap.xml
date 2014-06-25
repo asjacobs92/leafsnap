@@ -29,9 +29,8 @@
         <item name="actionModeBackground">@drawable/cab_background_top_leafsnap</item>
         <item name="actionModeSplitBackground">@drawable/cab_background_bottom_leafsnap</item>
         <item name="actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Leafsnap</item>
-        <item name="android:textViewStyle">@style/RobotoTextViewStyle</item>
-        <item name="android:buttonStyle">@style/RobotoButtonStyle</item>
-        <item name="android:activatedBackgroundIndicator">@drawable/activated_background</item>
+        <item name="android:typeface">serif</item>
+
         <!-- Light.DarkActionBar specific -->
         <item name="actionBarWidgetTheme">@style/Theme.Leafsnap.Widget</item>
 
@@ -83,17 +82,10 @@
         <item name="dropDownListViewStyle">@style/DropDownListView.Leafsnap</item>
     </style>
 
-    <style name="EditText.Leafsnap" parent="android:Widget.EditText">
+    <style name="EditText.Leafsnap" parent="android:style/Widget.EditText">
         <item name="android:background">@drawable/leafsnap_edit_text_holo_dark</item>
         <item name="android:textColor">@color/white</item>
     </style>
 
-    <style name="RobotoTextViewStyle" parent="android:Widget.TextView">
-        <item name="android:fontFamily">sans-serif</item>
-    </style>
-
-    <style name="RobotoButtonStyle" parent="android:Widget.Holo.Button">
-        <item name="android:fontFamily">sans-serif</item>
-    </style>
 
 </resources>

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE xml>
+<!DOCTYPE TableRow>
 <TableRow xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/tableRow"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/black" >
+          android:id="@+id/tableRow"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:background="@color/black">
 
     <ImageView
         android:id="@+id/item_image"
@@ -14,7 +14,7 @@
         android:layout_margin="5dp"
         android:contentDescription="@string/thumb_description"
         android:scaleType="fitCenter"
-        android:src="@drawable/sakura" />
+        android:src="@drawable/sakura"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -26,24 +26,24 @@
         android:layout_gravity="center_vertical">
 
         <TextView
-            android:id="@+id/itemText"
+            android:id="@+id/item_text"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fontFamily="arial"
             android:text="@string/todo"
             android:textColor="@color/white"
             android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"/>
 
         <TextView
-            android:id="@+id/itemSubtext"
+            android:id="@+id/item_subtext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="arial"
             android:text="@string/todo"
             android:textColor="@color/white"
             android:textSize="12sp"
-            android:textStyle="italic" />
+            android:textStyle="italic"/>
     </LinearLayout>
 
 </TableRow>

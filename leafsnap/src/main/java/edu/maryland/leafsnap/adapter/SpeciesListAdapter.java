@@ -1,6 +1,5 @@
 package edu.maryland.leafsnap.adapter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
@@ -27,16 +26,13 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 public class SpeciesListAdapter extends ArrayAdapter<Species> implements StickyListHeadersAdapter {
 
     private Filter mFilter;
-    private Context mContext;
     private LayoutInflater mInflater;
     private ArrayList<Species> mSpeciesList;
     private ArrayList<Species> mOriginalSpeciesList;
 
     public SpeciesListAdapter(Context context, ArrayList<Species> speciesList) {
         super(context, R.layout.species_list_item, speciesList);
-        this.mContext = context;
-        this.mSpeciesList = speciesList;
-        this.mOriginalSpeciesList = speciesList;
+        this.mSpeciesList = this.mOriginalSpeciesList = speciesList;
     }
 
     @Override
@@ -45,16 +41,20 @@ public class SpeciesListAdapter extends ArrayAdapter<Species> implements StickyL
     }
 
     @Override
+    public int getCount() {
+        return mSpeciesList.size();
+    }
+
+    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
 
         if (convertView == null) {
-            convertView = getInflater().inflate(R.layout.species_list_item, parent, false);
+            convertView = getLayoutInflater().inflate(R.layout.species_list_item, parent, false);
             holder = new ViewHolder();
-            holder.text = (TextView) convertView.findViewById(R.id.itemText);
-            holder.subtext = (TextView) convertView.findViewById(R.id.itemSubtext);
+            holder.text = (TextView) convertView.findViewById(R.id.item_text);
+            holder.subtext = (TextView) convertView.findViewById(R.id.item_subtext);
             holder.image = (ImageView) convertView.findViewById(R.id.item_image);
-
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -71,48 +71,6 @@ public class SpeciesListAdapter extends ArrayAdapter<Species> implements StickyL
     }
 
     @Override
-    public View getHeaderView(int position, View convertView, ViewGroup parent) {
-        HeaderViewHolder holder;
-        LayoutInflater inflater = ((Activity) mContext).getLayoutInflater();
-        if (convertView == null) {
-            holder = new HeaderViewHolder();
-            convertView = inflater.inflate(R.layout.species_list_section_header, parent, false);
-            holder.text = (TextView) convertView.findViewById(R.id.section_header);
-            convertView.setTag(holder);
-        } else {
-            holder = (HeaderViewHolder) convertView.getTag();
-        }
-
-        //set header text as first char in name
-        String headerText = "" + mSpeciesList.get(position).getCommomName().subSequence(0, 1).charAt(0);
-        holder.text.setText(headerText);
-        return convertView;
-    }
-
-    @Override
-    public long getHeaderId(int position) {
-        //return the first character of the country as ID because this is what headers are based upon
-        return mSpeciesList.get(position).getCommomName().subSequence(0, 1).charAt(0);
-    }
-
-    private Drawable getDrawableFromUrl(String url) {
-        InputStream ims = null;
-        try {
-            ims = mContext.getAssets().open(url);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return Drawable.createFromStream(ims, null);
-    }
-
-    public LayoutInflater getInflater() {
-        if (mInflater == null) {
-            mInflater = ((Activity) mContext).getLayoutInflater();
-        }
-        return mInflater;
-    }
-
-    @Override
     public Filter getFilter() {
         if (mFilter == null)
             mFilter = new SpeciesFilter();
@@ -120,16 +78,51 @@ public class SpeciesListAdapter extends ArrayAdapter<Species> implements StickyL
         return mFilter;
     }
 
+
     @Override
-    public int getCount() {
-        return mSpeciesList.size();
+    public View getHeaderView(int position, View convertView, ViewGroup parent) {
+        HeaderViewHolder holder;
+        if (convertView == null) {
+            holder = new HeaderViewHolder();
+            convertView = getLayoutInflater().inflate(R.layout.species_list_section_header, parent, false);
+            holder.text = (TextView) convertView.findViewById(R.id.section_header);
+            convertView.setTag(holder);
+        } else {
+            holder = (HeaderViewHolder) convertView.getTag();
+        }
+
+        String headerText = "" + mSpeciesList.get(position).getCommomName().subSequence(0, 1).charAt(0);
+        holder.text.setText(headerText);
+        return convertView;
     }
 
-    static class HeaderViewHolder {
+    @Override
+    public long getHeaderId(int position) {
+        return mSpeciesList.get(position).getCommomName().subSequence(0, 1).charAt(0);
+    }
+
+    private Drawable getDrawableFromUrl(String url) {
+        InputStream ims = null;
+        try {
+            ims = getContext().getAssets().open(url);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return Drawable.createFromStream(ims, null);
+    }
+
+    public LayoutInflater getLayoutInflater() {
+        if (mInflater == null) {
+            mInflater = LayoutInflater.from(getContext());
+        }
+        return mInflater;
+    }
+
+    private static class HeaderViewHolder {
         TextView text;
     }
 
-    static class ViewHolder {
+    private static class ViewHolder {
         TextView text;
         TextView subtext;
         ImageView image;
@@ -159,6 +152,4 @@ public class SpeciesListAdapter extends ArrayAdapter<Species> implements StickyL
             notifyDataSetChanged();
         }
     }
-
-
 }

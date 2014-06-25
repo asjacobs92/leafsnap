@@ -31,7 +31,6 @@ public class BrowseFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mDbHelper = OpenHelperManager.getHelper(getActivity(), DatabaseHelper.class);
         return inflater.inflate(R.layout.fragment_browse, container, false);
     }
 
@@ -80,11 +79,18 @@ public class BrowseFragment extends Fragment {
     private ArrayList<Species> getSpeciesList() {
         ArrayList<Species> speciesList = null;
         try {
-            speciesList = (ArrayList<Species>) mDbHelper.getSpeciesDao().queryForAll();
+            speciesList = (ArrayList<Species>) getDbHelper().getSpeciesDao().queryForAll();
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return speciesList;
+    }
+
+    public DatabaseHelper getDbHelper() {
+        if (mDbHelper == null) {
+            mDbHelper = OpenHelperManager.getHelper(getActivity(), DatabaseHelper.class);
+        }
+        return mDbHelper;
     }
 
     @Override
