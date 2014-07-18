@@ -2,6 +2,7 @@ package edu.maryland.leafsnap.adapter;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,9 +64,8 @@ public class SpeciesListAdapter extends ArrayAdapter<Species> implements StickyL
         Species species = getItem(position);
         holder.text.setText(species.getCommomName());
         holder.subtext.setText(species.getScientificName());
-        String[] splitUrl = species.getExampleImageFlower().getRawURL().replace("/species",
-                "species").split("\\?");
-        holder.image.setImageDrawable(getDrawableFromUrl(splitUrl[0]));
+        holder.image.setImageDrawable(getDrawableFromUrl(
+                species.getExampleImageFlower().getRawURL().replace("/species", "species").split("\\?")[0]));
 
         return convertView;
     }
@@ -105,10 +105,25 @@ public class SpeciesListAdapter extends ArrayAdapter<Species> implements StickyL
         InputStream ims = null;
         try {
             ims = getContext().getAssets().open(url);
+            /*if (isExternalStorageReadable()) {
+                File imageFile = new File(getContext().getExternalFilesDir(
+                        Environment.DIRECTORY_PICTURES), url);
+                ims = new FileInputStream(imageFile);
+            }*/
         } catch (IOException e) {
             e.printStackTrace();
         }
         return Drawable.createFromStream(ims, null);
+    }
+
+    /* Checks if external storage is available to at least read */
+    public boolean isExternalStorageReadable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state) ||
+                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+            return true;
+        }
+        return false;
     }
 
     public LayoutInflater getLayoutInflater() {

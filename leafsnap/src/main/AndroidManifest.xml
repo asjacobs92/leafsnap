@@ -1,39 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="edu.maryland.leafsnap"
-          android:versionCode="1"
-          android:versionName="1.0">
+    package="edu.maryland.leafsnap">
 
-    <uses-sdk
-        android:minSdkVersion="16"
-        android:targetSdkVersion="19"/>
-
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/leafy"
-        android:logo="@drawable/leafy_no_background"
         android:label="@string/app_name"
-        android:theme="@style/Theme.Leafsnap">
+        android:logo="@drawable/leafy_no_background"
+        android:theme="@style/Theme.Leafsnap" >
         <activity
             android:name=".activity.MainActivity"
-            android:label="@string/app_name">
+            android:label="@string/app_name" >
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".activity.SpeciesAcitivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_species_details_acitivity"
-            android:theme="@style/Theme.Leafsnap">
+            android:theme="@style/Theme.Leafsnap" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="edu.maryland.leafsnap.activity.MainActivity"/>
+                android:value="edu.maryland.leafsnap.activity.MainActivity" />
+        </activity>
+        <activity
+            android:name=".activity.OptionsAccountActivity"
+            android:label="@string/title_activity_options_account" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="edu.maryland.leafsnap.activity.MainActivity" />
+        </activity>
+        <activity
+            android:name=".activity.OptionsCameraActivity"
+            android:label="@string/title_activity_options_camera" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="edu.maryland.leafsnap.activity.MainActivity" />
+        </activity>
+        <activity
+            android:name=".activity.OptionsDatabaseActivity"
+            android:label="@string/title_activity_options_database" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="edu.maryland.leafsnap.activity.MainActivity" />
+        </activity>
+        <activity
+            android:name=".activity.AccountActionActivity"
+            android:label="@string/title_activity_options_account">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="edu.maryland.leafsnap.activity.OptionsAccountActivity" />
         </activity>
     </application>
 

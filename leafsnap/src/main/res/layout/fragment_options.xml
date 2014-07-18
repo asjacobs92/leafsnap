@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE RelativeLayout>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:columnCount="3"
                 android:orientation="vertical"
-                android:weightSum="1"
-                android:background="@color/black">
+                tools:context="edu.maryland.leafsnap.fragment.OptionsFragment" >
 
     <Button
         android:id="@+id/account_button"
@@ -18,7 +17,7 @@
         android:drawableRight="@drawable/ic_action_next_item"
         android:gravity="left|center_vertical"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="44dp"
+        android:layout_marginTop="45dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"/>
 
@@ -65,7 +64,7 @@
 
     <TextView
         android:id="@+id/username"
-        android:text="@string/username"
+        android:text="@string/not_logged_in"
         android:textColor="@color/leafsnap_grey"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

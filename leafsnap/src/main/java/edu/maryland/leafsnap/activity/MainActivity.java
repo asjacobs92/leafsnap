@@ -1,6 +1,5 @@
 package edu.maryland.leafsnap.activity;
 
-import android.content.Context;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -17,7 +16,7 @@ import android.widget.TextView;
 
 import edu.maryland.leafsnap.R;
 import edu.maryland.leafsnap.adapter.SectionsPagerAdapter;
-import edu.maryland.leafsnap.data.LeafletDatabaseContentRequest;
+import edu.maryland.leafsnap.api.LeafletImageManager;
 import edu.maryland.leafsnap.fragment.BrowseFragment;
 import edu.maryland.leafsnap.fragment.CameraFragment;
 import edu.maryland.leafsnap.fragment.CollectionFragment;
@@ -32,29 +31,18 @@ import edu.maryland.leafsnap.util.TabUtils;
  */
 public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {
 
-    /**
-     * Context of the {@link MainActivity}, and therefore, of the Application. This is static and accessible from
-     * anywhere in the code. However, must be set OnCreate to avoid NullPointerExecptions.
-     */
-    private static Context mContext;
     private final Fragment[] mFragments = {new HomeFragment(), new BrowseFragment(), new CollectionFragment(),
             new OptionsFragment(), new CameraFragment()};
     private ViewPager mViewPager;
     private SectionsPagerAdapter mSectionsPagerAdapter;
-    /**
-     * Developer option to populate database.
-     */
-    private boolean populateDatabase = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (populateDatabase) {
-            LeafletDatabaseContentRequest dbRequest = new LeafletDatabaseContentRequest(this);
-            dbRequest.fetchWholeDatabaseFromServer();
-        }
+        /* LeafletImageManager manager = new LeafletImageManager(this);
+        manager.consolidateDatabase(); */
 
         setupActionBar();
     }

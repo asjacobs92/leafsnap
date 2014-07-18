@@ -20,7 +20,7 @@ public class CollectedLeaf implements Serializable {
     @DatabaseField(generatedId = true)
     private int id;
     @DatabaseField
-    private int leafID;
+    private long leafID;
     @DatabaseField
     private String altitude;
     @DatabaseField
@@ -35,12 +35,13 @@ public class CollectedLeaf implements Serializable {
     private Date lastModified;
     @DatabaseField
     private SyncStatus syncStatus;
-    @DatabaseField(foreign = true, foreignAutoCreate = true)
+    @DatabaseField(foreign = true, foreignAutoRefresh = true)
     private Species selectedSpeciesRel;
-    @DatabaseField(foreign = true, foreignAutoCreate = true)
+    @DatabaseField(foreign = true, foreignAutoRefresh = true)
     private LeafletUrl originalImageURL;
-    @DatabaseField(foreign = true, foreignAutoCreate = true)
+    @DatabaseField(foreign = true, foreignAutoRefresh = true)
     private LeafletUrl segmentedImageURL;
+
     public CollectedLeaf() {
 
     }
@@ -53,11 +54,11 @@ public class CollectedLeaf implements Serializable {
         this.syncStatus = syncStatus;
     }
 
-    public int getLeafID() {
+    public long getLeafID() {
         return leafID;
     }
 
-    public void setLeafID(int leafID) {
+    public void setLeafID(long leafID) {
         this.leafID = leafID;
     }
 
@@ -136,5 +137,4 @@ public class CollectedLeaf implements Serializable {
     public enum SyncStatus {
         SERVER_IS_NEWER, SAME, PHONE_IS_NEWER;
     }
-
 }
