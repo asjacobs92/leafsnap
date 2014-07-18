@@ -1,17 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE xml>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:columnCount="3"
-    android:orientation="vertical" >
+<!DOCTYPE RelativeLayout>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                tools:context="edu.maryland.leafsnap.fragment.OptionsFragment" >
+
+    <Button
+        android:id="@+id/account_button"
+        android:text="@string/option_account"
+        android:layout_width="@dimen/options_button_width"
+        android:layout_height="@dimen/options_button_height"
+        android:textColor="@color/white"
+        android:drawableLeft="@drawable/ic_action_person"
+        android:drawableRight="@drawable/ic_action_next_item"
+        android:gravity="left|center_vertical"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="45dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:id="@+id/camera_button"
+        android:text="@string/option_photo_size"
+        android:layout_width="@dimen/options_button_width"
+        android:layout_height="@dimen/options_button_height"
+        android:textColor="@color/white"
+        android:drawableLeft="@drawable/ic_action_camera"
+        android:drawableRight="@drawable/ic_action_next_item"
+        android:gravity="left|center_vertical"
+        android:layout_gravity="center_horizontal"
+        android:layout_below="@+id/account_button"
+        android:layout_alignLeft="@+id/account_button"
+        android:layout_alignStart="@+id/account_button"/>
+
+    <Button
+        android:id="@+id/database_button"
+        android:text="@string/option_database"
+        android:layout_width="@dimen/options_button_width"
+        android:layout_height="@dimen/options_button_height"
+        android:textColor="@color/white"
+        android:drawableLeft="@drawable/ic_action_storage"
+        android:drawableRight="@drawable/ic_action_next_item"
+        android:gravity="left|center_vertical"
+        android:layout_gravity="center_horizontal"
+        android:layout_below="@+id/camera_button"
+        android:layout_alignLeft="@+id/camera_button"
+        android:layout_alignStart="@+id/camera_button"/>
 
     <TextView
-        android:id="@+id/rand_thumb_text"
+        android:id="@+id/current_user"
+        android:text="@string/current_user"
+        android:textColor="@color/white"
+        android:textStyle="bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/todo"
-        android:textColor="@color/white" />
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_below="@+id/database_button"
+        android:layout_alignLeft="@+id/database_button"
+        android:layout_alignStart="@+id/database_button"
+        android:layout_marginTop="20dp"/>
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/username"
+        android:text="@string/not_logged_in"
+        android:textColor="@color/leafsnap_grey"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_alignTop="@+id/current_user"
+        android:layout_alignRight="@+id/database_button"
+        android:layout_alignEnd="@+id/database_button"/>
+
+    <TextView
+        android:id="@+id/current_version"
+        android:text="@string/current_version"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_marginTop="15dp"
+        android:layout_below="@+id/current_user"
+        android:layout_alignLeft="@+id/current_user"
+        android:layout_alignStart="@+id/current_user"/>
+
+    <TextView
+        android:id="@+id/version"
+        android:text="@string/version"
+        android:textColor="@color/leafsnap_grey"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_alignTop="@+id/current_version"
+        android:layout_alignRight="@+id/username"
+        android:layout_alignEnd="@+id/username"/>
+</RelativeLayout>

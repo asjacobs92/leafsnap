@@ -144,14 +144,12 @@ public class SpeciesImagesFragment extends Fragment {
     }
 
     private void initImagePicker() {
-        ImageView imageDisplay = (ImageView) getActivity().findViewById(R.id.image_display);
         LinearLayout imagePicker = (LinearLayout) getActivity().findViewById(R.id.image_picker);
         try {
             List<LeafletUrl> leafletUrls = mDbHelper.getLeafletUrlDao().queryForEq("associatedSpecies_id",
                     mSpecies.getId());
             for (LeafletUrl leafletUrl : leafletUrls) {
-                String rawUrl = leafletUrl.getRawURL().replace("/species", "species");
-                Drawable d = getDrawableFromUrl(rawUrl);
+                Drawable d = getDrawableFromUrl(leafletUrl.getRawURL().replace("/species", "species"));
                 if (d != null) {
                     imagePicker.addView(getSmallImageLayout(leafletUrl, d));
                 }
@@ -209,8 +207,6 @@ public class SpeciesImagesFragment extends Fragment {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Drawable d = Drawable.createFromStream(ims, null);
-
-        return d;
+        return Drawable.createFromStream(ims, null);
     }
 }

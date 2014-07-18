@@ -2,46 +2,40 @@
 <pre-dex-items>
 
     <item
-        dex="D:\asjacobs\Workspace\Leafsnap\leafsnap\build\intermediates\pre-dexed\debug\classes-7c60fadb78734bd8310c07244aee2e3eda94dd34.jar"
-        jar="D:\asjacobs\Workspace\Leafsnap\build\intermediates\exploded-aar\se.emilsjolander\stickylistheaders\2.4.1\classes.jar"
+        dex="D:\asjacobs\Workspace\leafsnap\leafsnap\build\intermediates\pre-dexed\debug\ormlite-core-4.48-d29bbf5758703c33a5d906ad4b76d53005927c81.jar"
+        jar="C:\Users\Arthur Jacobs\.gradle\caches\modules-2\files-2.1\com.j256.ormlite\ormlite-core\4.48\e579bd2905d0399af5029aaaf9817d5fa0ca88a5\ormlite-core-4.48.jar"
         jumboMode="false"
         revision="19.1.0"
-        sha1="a6f266a9ae5273ae08a1d758e6a05c927690f19f"/>
+        sha1="e579bd2905d0399af5029aaaf9817d5fa0ca88a5"/>
     <item
-        dex="D:\asjacobs\Workspace\Leafsnap\leafsnap\build\intermediates\pre-dexed\debug\support-v4-19.1.0-e311e493b238b75da4095bd5ee7b69d76d73dc42.jar"
+        dex="D:\asjacobs\Workspace\leafsnap\leafsnap\build\intermediates\pre-dexed\debug\support-v4-19.1.0-e311e493b238b75da4095bd5ee7b69d76d73dc42.jar"
         jar="C:\Program Files (x86)\Android\android-studio\sdk\extras\android\m2repository\com\android\support\support-v4\19.1.0\support-v4-19.1.0.jar"
         jumboMode="false"
         revision="19.1.0"
         sha1="85f201b380937e61a9dce6ca90ccf6872abbfb67"/>
     <item
-        dex="D:\asjacobs\Workspace\Leafsnap\leafsnap\build\intermediates\pre-dexed\debug\android-async-http-1.4.4-387a7cc5d40ff20a0a4273a7bf77acb9c93edf2f.jar"
-        jar="D:\asjacobs\Workspace\Leafsnap\leafsnap\libs\android-async-http-1.4.4.jar"
+        dex="D:\asjacobs\Workspace\leafsnap\leafsnap\build\intermediates\pre-dexed\debug\classes-327ecbbb69db5285ec74911f278d8759ecd7ce6c.jar"
+        jar="D:\asjacobs\Workspace\leafsnap\leafsnap\build\intermediates\exploded-aar\se.emilsjolander\stickylistheaders\2.4.1\classes.jar"
         jumboMode="false"
         revision="19.1.0"
-        sha1="3bae85a076241828810bf8fbcc12e5891d5fc34c"/>
+        sha1="a6f266a9ae5273ae08a1d758e6a05c927690f19f"/>
     <item
-        dex="D:\asjacobs\Workspace\Leafsnap\leafsnap\build\intermediates\pre-dexed\debug\classes-8073605d1d2631849086984c734deb4ce321d7e9.jar"
-        jar="D:\asjacobs\Workspace\Leafsnap\build\intermediates\exploded-aar\com.android.support\appcompat-v7\19.0.1\classes.jar"
-        jumboMode="false"
-        revision="19.1.0"
-        sha1="f71a6822470c9eb659d4f4a6cb57b780b35f058b"/>
-    <item
-        dex="D:\asjacobs\Workspace\Leafsnap\leafsnap\build\intermediates\pre-dexed\debug\support-v13-19.1.0-0225ee081b034b3a8fe6711ca79ab2a74d361711.jar"
-        jar="C:\Program Files (x86)\Android\android-studio\sdk\extras\android\m2repository\com\android\support\support-v13\19.1.0\support-v13-19.1.0.jar"
-        jumboMode="false"
-        revision="19.1.0"
-        sha1="6b852a232f642c75a7fdfc7212b841b8c8f8959c"/>
-    <item
-        dex="D:\asjacobs\Workspace\Leafsnap\leafsnap\build\intermediates\pre-dexed\debug\ormlite-android-4.48-5846b82b04713fcd7b3fcd8aa55aad038469a810.jar"
-        jar="D:\asjacobs\Workspace\Leafsnap\leafsnap\libs\ormlite-android-4.48.jar"
+        dex="D:\asjacobs\Workspace\leafsnap\leafsnap\build\intermediates\pre-dexed\debug\ormlite-android-4.48-9645c57b844198d41499e5331d9ebf930baf3059.jar"
+        jar="C:\Users\Arthur Jacobs\.gradle\caches\modules-2\files-2.1\com.j256.ormlite\ormlite-android\4.48\afa06f539a4026c10b247386312aa67404b80a16\ormlite-android-4.48.jar"
         jumboMode="false"
         revision="19.1.0"
         sha1="afa06f539a4026c10b247386312aa67404b80a16"/>
     <item
-        dex="D:\asjacobs\Workspace\Leafsnap\leafsnap\build\intermediates\pre-dexed\debug\ormlite-core-4.48-eadad75bda53ee7108a1ae19cd34e0d30b5c7e6a.jar"
-        jar="D:\asjacobs\Workspace\Leafsnap\leafsnap\libs\ormlite-core-4.48.jar"
+        dex="D:\asjacobs\Workspace\leafsnap\leafsnap\build\intermediates\pre-dexed\debug\classes-55e0c34ed26c9ca4b230af0d44c5998959af557f.jar"
+        jar="D:\asjacobs\Workspace\leafsnap\leafsnap\build\intermediates\exploded-aar\com.android.support\appcompat-v7\19.1.0\classes.jar"
         jumboMode="false"
         revision="19.1.0"
-        sha1="e579bd2905d0399af5029aaaf9817d5fa0ca88a5"/>
+        sha1="3499ceba05ca1f6037c6a2fad73df8f636224a28"/>
+    <item
+        dex="D:\asjacobs\Workspace\leafsnap\leafsnap\build\intermediates\pre-dexed\debug\android-async-http-1.4.5-2785570bc34266a9ae53943daf0acac2c2b7f184.jar"
+        jar="C:\Users\Arthur Jacobs\.gradle\caches\modules-2\files-2.1\com.loopj.android\android-async-http\1.4.5\77bf7cacf9cefe19dc105e5425d2eb1bb5285881\android-async-http-1.4.5.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="77bf7cacf9cefe19dc105e5425d2eb1bb5285881"/>
 
 </pre-dex-items>
