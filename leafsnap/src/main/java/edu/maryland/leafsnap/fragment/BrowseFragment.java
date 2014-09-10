@@ -72,6 +72,7 @@ public class BrowseFragment extends Fragment {
                     intent.putExtras(args);
                     getActivity().startActivity(intent);
                     searchSpecies.setText("");
+                    searchSpecies.clearFocus();
                 }
             });
         }

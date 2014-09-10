@@ -1,6 +1,5 @@
 package edu.maryland.leafsnap.fragment;
 
-import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -13,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -30,37 +30,22 @@ import edu.maryland.leafsnap.activity.SpeciesAcitivity;
 import edu.maryland.leafsnap.data.DatabaseHelper;
 import edu.maryland.leafsnap.model.LeafletUrl;
 import edu.maryland.leafsnap.model.Species;
-import edu.maryland.leafsnap.util.SystemUiHider;
+import uk.co.senab.photoview.PhotoViewAttacher;
 
 public class SpeciesImagesFragment extends Fragment {
 
-    /**
-     * If set, will toggle the system UI visibility upon interaction. Otherwise,
-     * will show the system UI visibility upon interaction.
-     */
-    private static final boolean TOGGLE_ON_CLICK = true;
-
-    /**
-     * The flags to pass to {@link edu.maryland.leafsnap.util.SystemUiHider#getInstance}.
-     */
-    private static final int HIDER_FLAGS = SystemUiHider.FLAG_HIDE_NAVIGATION;
-
-    /**
-     * The instance of the {@link SystemUiHider} for this activity.
-     */
-    private SystemUiHider mSystemUiHider;
+    private boolean fullscreen = false;
 
     private Species mSpecies;
-
     private DatabaseHelper mDbHelper;
+    private PhotoViewAttacher mAttacher;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mDbHelper = OpenHelperManager.getHelper(getActivity(), DatabaseHelper.class);
         Bundle b = this.getArguments();
         if (b != null) {
-            mSpecies = (Species) b.getSerializable(SpeciesAcitivity.ARG_SPECIES);
+            setSpecies((Species) b.getSerializable(SpeciesAcitivity.ARG_SPECIES));
         }
         return inflater.inflate(R.layout.fragment_species_images, container, false);
     }
@@ -78,6 +63,16 @@ public class SpeciesImagesFragment extends Fragment {
         setImageDisplayFirstLeaflet();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if (mDbHelper != null) {
+            OpenHelperManager.releaseHelper();
+            mDbHelper = null;
+        }
+    }
+
     private void setImageDisplayFirstLeaflet() {
         ImageView imageDisplay = (ImageView) getActivity().findViewById(R.id.image_display);
         LinearLayout imagePicker = (LinearLayout) getActivity().findViewById(R.id.image_picker);
@@ -86,68 +81,56 @@ public class SpeciesImagesFragment extends Fragment {
         if (imageLayout != null) {
             imageDisplay.setImageDrawable(((ImageView) imageLayout.getChildAt(0))
                     .getDrawable());
+            if (getAttacher() == null) {
+                setAttacher(new PhotoViewAttacher(imageDisplay));
+            } else {
+                getAttacher().update();
+            }
         }
     }
 
     private void initImageDisplay() {
-        ImageView imageDisplay = (ImageView) getActivity().findViewById(R.id.image_display);
         setImageDisplayFirstLeaflet();
 
-        mSystemUiHider = SystemUiHider.getInstance(getActivity(), imageDisplay, HIDER_FLAGS);
-        mSystemUiHider.setup();
-        mSystemUiHider.setOnVisibilityChangeListener(getOnVisibilityChangeListener());
-
-        imageDisplay.setOnClickListener(new View.OnClickListener() {
+        getAttacher().setOnPhotoTapListener(new PhotoViewAttacher.OnPhotoTapListener() {
             @Override
-            public void onClick(View view) {
-                if (TOGGLE_ON_CLICK) {
-                    mSystemUiHider.toggle();
+            public void onPhotoTap(View view, float v, float v2) {
+                if (isFullscreen()) {
+                    toggleFullscreen(false);
                 } else {
-                    mSystemUiHider.show();
+                    toggleFullscreen(true);
                 }
             }
         });
     }
 
-    private SystemUiHider.OnVisibilityChangeListener getOnVisibilityChangeListener() {
-        return new SystemUiHider.OnVisibilityChangeListener() {
-            int mControlsHeight;
-            int mShortAnimTime;
+    private void toggleFullscreen(boolean fullscreen) {
+        setFullscreen(fullscreen);
+        WindowManager.LayoutParams attrs = getActivity().getWindow().getAttributes();
+        if (fullscreen) {
+            attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+            ((ActionBarActivity) getActivity()).getSupportActionBar().hide();
+        } else {
+            attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
+            ((ActionBarActivity) getActivity()).getSupportActionBar().show();
+        }
+        getActivity().getWindow().setAttributes(attrs);
 
-            @Override
-            @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-            public void onVisibilityChange(boolean visible) {
-                if (visible) {
-                    ((ActionBarActivity) getActivity()).getSupportActionBar().show();
-                } else {
-                    ((ActionBarActivity) getActivity()).getSupportActionBar().hide();
-                }
-
-                FrameLayout optionsBar = (FrameLayout) getActivity().findViewById(R.id.images_options_bar);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-                    if (mControlsHeight == 0) {
-                        mControlsHeight = optionsBar.getHeight();
-                    }
-
-                    if (mShortAnimTime == 0) {
-                        mShortAnimTime = getResources().getInteger(
-                                android.R.integer.config_shortAnimTime);
-                    }
-                    optionsBar.animate()
-                            .translationY(visible ? 0 : mControlsHeight)
-                            .setDuration(mShortAnimTime);
-                } else {
-                    optionsBar.setVisibility(visible ? View.VISIBLE : View.GONE);
-                }
-            }
-        };
+        FrameLayout optionsBar = (FrameLayout) getActivity().findViewById(R.id.images_options_bar);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            optionsBar.animate()
+                    .translationY(fullscreen ? optionsBar.getHeight() : 0)
+                    .setDuration(getResources().getInteger(android.R.integer.config_shortAnimTime));
+        } else {
+            optionsBar.setVisibility(fullscreen ? View.GONE : View.VISIBLE);
+        }
     }
 
     private void initImagePicker() {
         LinearLayout imagePicker = (LinearLayout) getActivity().findViewById(R.id.image_picker);
         try {
-            List<LeafletUrl> leafletUrls = mDbHelper.getLeafletUrlDao().queryForEq("associatedSpecies_id",
-                    mSpecies.getId());
+            List<LeafletUrl> leafletUrls = getDbHelper().getLeafletUrlDao().queryForEq("associatedSpecies_id",
+                    getSpecies().getId());
             for (LeafletUrl leafletUrl : leafletUrls) {
                 Drawable d = getDrawableFromUrl(leafletUrl.getRawURL().replace("/species", "species"));
                 if (d != null) {
@@ -168,6 +151,7 @@ public class SpeciesImagesFragment extends Fragment {
                 ImageView imageDisplay = (ImageView) getActivity().findViewById(R.id.image_display);
                 imageDisplay.setImageDrawable(((ImageView) view)
                         .getDrawable());
+                getAttacher().update();
                 return true;
             }
         });
@@ -208,5 +192,36 @@ public class SpeciesImagesFragment extends Fragment {
             e.printStackTrace();
         }
         return Drawable.createFromStream(ims, null);
+    }
+
+    private DatabaseHelper getDbHelper() {
+        if (mDbHelper == null) {
+            mDbHelper = OpenHelperManager.getHelper(getActivity(), DatabaseHelper.class);
+        }
+        return mDbHelper;
+    }
+
+    private PhotoViewAttacher getAttacher() {
+        return mAttacher;
+    }
+
+    private void setAttacher(PhotoViewAttacher mAttacher) {
+        this.mAttacher = mAttacher;
+    }
+
+    private Species getSpecies() {
+        return mSpecies;
+    }
+
+    private void setSpecies(Species mSpecies) {
+        this.mSpecies = mSpecies;
+    }
+
+    private boolean isFullscreen() {
+        return fullscreen;
+    }
+
+    private void setFullscreen(boolean fullscreen) {
+        this.fullscreen = fullscreen;
     }
 }

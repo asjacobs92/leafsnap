@@ -6,7 +6,7 @@
     <string name="title_browse_tab" translatable="false">Browse</string>
     <string name="title_collection_tab" translatable="false">Collection</string>
     <string name="title_options_tab" translatable="false">Options</string>
-    <string name="title_camera_tab" translatable="false">Snap it!</string>
+    <string name="title_action_snap" translatable="false">Snap it!</string>
     <string name="action_about" translatable="false">About</string>
     <string name="action_help" translatable="false">Help</string>
     <string name="tab_icon_description" translatable="false">Tab icon.</string>
@@ -51,5 +51,12 @@
     <string name="login_warning">Please login first.</string>
     <string name="collection_sync_success">Collection successfully synced.</string>
     <string name="collection_sync_progress">User collection sync in progress.</string>
+    <string name="empty_collection">You haven\'t done any collecting yet.</string>
+    <string name="start_collection">Start your collection by tapping on the Snap It! button</string>
+    <string name="title_activity_collected_leaf">CollectedLeafActivity</string>
+    <string name="snap_results">Snap It! Results</string>
+    <string name="user_collection">\'s Collection</string>
+    <string name="unlabeled_species">Unlabeled species</string>
+    <string name="collected">Collected </string>
 
 </resources>

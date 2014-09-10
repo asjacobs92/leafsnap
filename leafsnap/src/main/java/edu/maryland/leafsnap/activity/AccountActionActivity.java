@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -15,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.table.TableUtils;
 
 import java.sql.SQLException;
@@ -227,6 +227,16 @@ public class AccountActionActivity extends ActionBarActivity {
             mDbHelper = new DatabaseHelper(this);
         }
         return mDbHelper;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if (mDbHelper != null) {
+            OpenHelperManager.releaseHelper();
+            mDbHelper = null;
+        }
     }
 
     public enum AccountAction {

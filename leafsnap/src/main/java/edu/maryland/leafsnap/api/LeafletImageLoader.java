@@ -25,12 +25,12 @@ public class LeafletImageLoader {
 
     private static final String LOG_TAG = "IMAGE_LOADER";
 
-    private static final String IMAGES_DIR = "images/";
-
     private static final long MINIMUM_FREE_SPACE_BYTES = 104857600;
 
-    private boolean synchronous;
     private Context mContext;
+
+    private boolean mSynchronous;
+
     private LeafletUrl mLeafletUrl;
 
     public LeafletImageLoader(Context context, LeafletUrl leafletUrl) {
@@ -46,7 +46,17 @@ public class LeafletImageLoader {
     }
 
     public void loadImage() {
-        BinaryHttpResponseHandler handler = new BinaryHttpResponseHandler() {
+        BinaryHttpResponseHandler handler = getBinaryHttpResponseHandler();
+
+        if (isSynchronous()) {
+            LeafletSyncRestClient.get(getLeafletUrl().getRawURL(), null, handler);
+        } else {
+            LeafletAsyncRestClient.get(getLeafletUrl().getRawURL(), null, handler);
+        }
+    }
+
+    private BinaryHttpResponseHandler getBinaryHttpResponseHandler() {
+        return new BinaryHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] binaryData) {
                 Bitmap image = BitmapFactory.decodeByteArray(binaryData, 0, binaryData.length);
@@ -60,12 +70,6 @@ public class LeafletImageLoader {
                 Log.e(LOG_TAG, "Could not download image. Error: " + error.getMessage());
             }
         };
-
-        if (isSynchronous()) {
-            LeafletSyncRestClient.get(getLeafletUrl().getRawURL(), null, handler);
-        } else {
-            LeafletAsyncRestClient.get(getLeafletUrl().getRawURL(), null, handler);
-        }
     }
 
     private void saveImageToExternalStorage(Bitmap image, String imagePath) {
@@ -106,11 +110,11 @@ public class LeafletImageLoader {
 
 
     public boolean isSynchronous() {
-        return synchronous;
+        return mSynchronous;
     }
 
     public void setSynchronous(boolean synchronous) {
-        this.synchronous = synchronous;
+        this.mSynchronous = synchronous;
     }
 
     private Context getContext() {

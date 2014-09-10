@@ -1,17 +1,71 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE xml>
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE LinearLayout>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:columnCount="3"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/rand_thumb_text"
+    <RelativeLayout
+        android:id="@+id/collection_view"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/todo"
-        android:textColor="@color/white" />
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/collection_list_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|left"
+            android:alpha="0.4"
+            android:background="@color/list_header_grey"
+            android:padding="5dp"
+            android:textColor="@color/white"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+        <ListView
+            android:id="@+id/collection_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:drawSelectorOnTop="true"
+            android:fastScrollEnabled="true"
+            android:divider="@drawable/listview_divider"
+            android:listSelector="@drawable/listview_selector"
+            android:layout_below="@+id/collection_list_header"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/empty_collection_view"
+        android:visibility="gone"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/textView"
+            android:textColor="@color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/empty_collection"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="45dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/start_collection"
+            android:layout_below="@+id/textView"
+            android:layout_centerHorizontal="true"
+            android:padding="50dp" />
+    </RelativeLayout>
+
 
 </LinearLayout>

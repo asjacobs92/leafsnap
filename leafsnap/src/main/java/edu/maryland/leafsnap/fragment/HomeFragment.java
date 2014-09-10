@@ -26,8 +26,6 @@ import edu.maryland.leafsnap.model.Species;
 
 public class HomeFragment extends Fragment {
 
-    private static final String LOG_TAG = "HOME_FRAGMENT";
-
     private static final int ANIMATION_LENGTH_MILLI = 6000;
     private static final int ANIMATION_FADE_LENGTH_MILLI = 3000;
 

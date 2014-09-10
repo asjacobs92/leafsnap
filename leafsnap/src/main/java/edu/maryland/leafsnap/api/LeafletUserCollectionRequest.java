@@ -1,7 +1,6 @@
 package edu.maryland.leafsnap.api;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -32,6 +31,7 @@ public class LeafletUserCollectionRequest {
     private boolean mFinished;
 
     private Context mContext;
+
     private DatabaseHelper mDbHelper;
 
     public LeafletUserCollectionRequest(Context context) {
@@ -65,7 +65,6 @@ public class LeafletUserCollectionRequest {
     }
 
     private void parseResult(JSONObject result) throws JSONException, SQLException {
-        Log.d("TAAAAG", result.toString());
         JSONArray images = result.getJSONArray("images");
         for (int i = 0; i < images.length(); i++) {
             JSONObject oneImage = images.getJSONObject(i);
@@ -80,16 +79,18 @@ public class LeafletUserCollectionRequest {
             collectedLeaf = parseCollectedLeafLatitude(collectedLeaf, oneImage);
             collectedLeaf = parseCollectedLeafLongitude(collectedLeaf, oneImage);
 
-            collectedLeaf = parseSelectedSpeciesRel(oneImage, collectedLeaf);
+            collectedLeaf = parseSelectedSpeciesRel(collectedLeaf, oneImage);
             collectedLeaf = parseOriginalImageUrl(collectedLeaf);
             collectedLeaf = parseSegmentedImageUrl(collectedLeaf);
 
             getDbHelper().getCollectedLeafDao().create(collectedLeaf);
-        }
 
+            LeafletRecognitionRequest recognitionRequest = new LeafletRecognitionRequest(getContext(), collectedLeaf, true);
+            recognitionRequest.loadRecognitionResult();
+        }
     }
 
-    private CollectedLeaf parseSelectedSpeciesRel(JSONObject oneImage, CollectedLeaf collectedLeaf) throws SQLException {
+    private CollectedLeaf parseSelectedSpeciesRel(CollectedLeaf collectedLeaf, JSONObject oneImage) throws SQLException {
         try {
             String scientificName = oneImage.getString("sciname");
             List<Species> speciesList = getDbHelper().getSpeciesDao().queryForEq("scientificName", scientificName);

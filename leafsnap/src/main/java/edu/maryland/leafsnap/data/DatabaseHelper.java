@@ -40,31 +40,26 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private static final String ASSET_DB_PATH = "databases";
     //private static final String ASSET_SPECIES_PATH = "species";
 
-    private Context mContext = null;
+    private Context mContext;
 
-    private String mAssetPath = null;
+    private SQLiteDatabase mDatabase;
 
-    private String mDatabasePath = null;
+    private String mAssetPath;
 
-    private boolean mIsInitializing = false;
+    private String mDatabasePath;
 
-    private SQLiteDatabase mDatabase = null;
+    private boolean mIsInitializing;
 
-    private Dao<Species, Integer> speciesDao = null;
-
-    private Dao<LeafletUrl, Integer> leafletUrlDao = null;
-
-    private Dao<DatabaseInfo, Integer> databaseInfoDao = null;
-
-    private Dao<RankedSpecies, Integer> rankedSpeciesDao = null;
-
-    private Dao<CollectedLeaf, Integer> collectedLeafDao = null;
+    private Dao<Species, Integer> speciesDao;
+    private Dao<LeafletUrl, Integer> leafletUrlDao;
+    private Dao<DatabaseInfo, Integer> databaseInfoDao;
+    private Dao<RankedSpecies, Integer> rankedSpeciesDao;
+    private Dao<CollectedLeaf, Integer> collectedLeafDao;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION, R.raw.ormlite_config);
         setContext(context);
-
-        setAssetPath(ASSET_DB_PATH + "/" + DATABASE_NAME + ".sqlite");
+        setAssetPath(ASSET_DB_PATH + "/" + DATABASE_NAME);
         setDatabasePath(context.getApplicationInfo().dataDir + "/databases");
     }
 
@@ -97,6 +92,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
+
     @Override
     public synchronized SQLiteDatabase getWritableDatabase() {
         if (getDatabase() != null && getDatabase().isOpen() && !getDatabase().isReadOnly()) {
@@ -117,7 +113,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         SQLiteDatabase db = null;
         try {
             setIsInitializing(true);
-            db = createOrOpenDatabase(false);
+            db = createOrOpenDatabase();
 
             onOpen(db);
             success = true;
@@ -180,7 +176,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         }
     }
 
-    private SQLiteDatabase createOrOpenDatabase(boolean force) {
+    private SQLiteDatabase createOrOpenDatabase() {
         // test for the existence of the db file first and don't attempt open
         // to prevent the error trace in log on API 14+
         SQLiteDatabase db = null;
@@ -201,7 +197,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     private SQLiteDatabase returnDatabase() {
         try {
-            SQLiteDatabase db = SQLiteDatabase.openDatabase(getDatabasePath() + "/" + DATABASE_NAME + ".sqlite", null, SQLiteDatabase.OPEN_READWRITE);
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(getDatabasePath() + "/" + DATABASE_NAME, null, SQLiteDatabase.OPEN_READWRITE);
             Log.i(TAG, "successfully opened database " + DATABASE_NAME);
             return db;
         } catch (SQLiteException e) {
@@ -213,7 +209,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private void copyDatabaseFromAssets() {
         Log.w(TAG, "copying database from assets...");
 
-        InputStream is = null;
+        InputStream is;
         try {
             is = getContext().getAssets().open(getAssetPath());
             File f = new File(getDatabasePath() + "/");
@@ -221,7 +217,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
                 f.mkdir();
             }
 
-            writeFileToDisk(is, new FileOutputStream(getDatabasePath() + "/" + DATABASE_NAME + ".sqlite"));
+            writeFileToDisk(is, new FileOutputStream(getDatabasePath() + "/" + DATABASE_NAME));
 
             Log.w(TAG, "database copy complete");
         } catch (IOException e) {
@@ -231,7 +227,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     /*private void copyAssetsToExternalStorage(String path) {
         AssetManager assetManager = getContext().getAssets();
-        String assets[] = null;
+        String assets[];
         try {
             assets = assetManager.list(path);
             if (assets.length == 0) {

@@ -20,9 +20,9 @@ public class RankedSpecies implements Serializable {
     private int id;
     @DatabaseField
     private int rank;
-    @DatabaseField(foreign = true)
+    @DatabaseField(foreign = true, foreignAutoRefresh = true)
     private Species species;
-    @DatabaseField(foreign = true)
+    @DatabaseField(foreign = true, foreignAutoRefresh = true)
     private CollectedLeaf associatedCollection;
 
     public RankedSpecies() {

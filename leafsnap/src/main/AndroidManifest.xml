@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="edu.maryland.leafsnap">
+    package="edu.maryland.leafsnap" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -11,7 +11,6 @@
         android:allowBackup="true"
         android:icon="@drawable/leafy"
         android:label="@string/app_name"
-        android:logo="@drawable/leafy_no_background"
         android:theme="@style/Theme.Leafsnap" >
         <activity
             android:name=".activity.MainActivity"
@@ -53,10 +52,18 @@
         </activity>
         <activity
             android:name=".activity.AccountActionActivity"
-            android:label="@string/title_activity_options_account">
+            android:label="@string/title_activity_options_account" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="edu.maryland.leafsnap.activity.OptionsAccountActivity" />
+        </activity>
+        <activity
+            android:name=".activity.CollectedLeafActivity"
+            android:label="@string/title_activity_collected_leaf"
+            android:parentActivityName=".activity.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="edu.maryland.leafsnap.activity.MainActivity" />
         </activity>
     </application>
 

@@ -14,11 +14,17 @@
         revision="19.1.0"
         sha1="85f201b380937e61a9dce6ca90ccf6872abbfb67"/>
     <item
-        dex="D:\asjacobs\Workspace\leafsnap\leafsnap\build\intermediates\pre-dexed\debug\classes-327ecbbb69db5285ec74911f278d8759ecd7ce6c.jar"
-        jar="D:\asjacobs\Workspace\leafsnap\leafsnap\build\intermediates\exploded-aar\se.emilsjolander\stickylistheaders\2.4.1\classes.jar"
+        dex="D:\asjacobs\Workspace\leafsnap\leafsnap\build\intermediates\pre-dexed\debug\classes-83def9ecdfb98c294a25570d0a3142240c08893d.jar"
+        jar="D:\asjacobs\Workspace\leafsnap\leafsnap\build\intermediates\exploded-aar\com.github.chrisbanes.photoview\library\1.2.3\classes.jar"
         jumboMode="false"
         revision="19.1.0"
-        sha1="a6f266a9ae5273ae08a1d758e6a05c927690f19f"/>
+        sha1="81aa0e8e77d948204aa6754019c6f3c04dd922e3"/>
+    <item
+        dex="D:\asjacobs\Workspace\leafsnap\leafsnap\build\intermediates\pre-dexed\debug\android-async-http-1.4.6-a2c764674231294aefae7b7c0c31b0d46c459c51.jar"
+        jar="C:\Users\Arthur Jacobs\.gradle\caches\modules-2\files-2.1\com.loopj.android\android-async-http\1.4.6\a845a88238be0b5be9d238652c1bc0605ef91f52\android-async-http-1.4.6.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="a845a88238be0b5be9d238652c1bc0605ef91f52"/>
     <item
         dex="D:\asjacobs\Workspace\leafsnap\leafsnap\build\intermediates\pre-dexed\debug\ormlite-android-4.48-9645c57b844198d41499e5331d9ebf930baf3059.jar"
         jar="C:\Users\Arthur Jacobs\.gradle\caches\modules-2\files-2.1\com.j256.ormlite\ormlite-android\4.48\afa06f539a4026c10b247386312aa67404b80a16\ormlite-android-4.48.jar"
@@ -32,10 +38,10 @@
         revision="19.1.0"
         sha1="3499ceba05ca1f6037c6a2fad73df8f636224a28"/>
     <item
-        dex="D:\asjacobs\Workspace\leafsnap\leafsnap\build\intermediates\pre-dexed\debug\android-async-http-1.4.5-2785570bc34266a9ae53943daf0acac2c2b7f184.jar"
-        jar="C:\Users\Arthur Jacobs\.gradle\caches\modules-2\files-2.1\com.loopj.android\android-async-http\1.4.5\77bf7cacf9cefe19dc105e5425d2eb1bb5285881\android-async-http-1.4.5.jar"
+        dex="D:\asjacobs\Workspace\leafsnap\leafsnap\build\intermediates\pre-dexed\debug\classes-9078c00e7aa467135be1d39aa605bf4775aae201.jar"
+        jar="D:\asjacobs\Workspace\leafsnap\leafsnap\build\intermediates\exploded-aar\se.emilsjolander\stickylistheaders\2.5.0\classes.jar"
         jumboMode="false"
         revision="19.1.0"
-        sha1="77bf7cacf9cefe19dc105e5425d2eb1bb5285881"/>
+        sha1="5682a0f7a23864f71e826f9a0fe567c2a2628cb1"/>
 
 </pre-dex-items>

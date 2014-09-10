@@ -1,7 +1,5 @@
 package edu.maryland.leafsnap.activity;
 
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -53,14 +51,7 @@ public class SpeciesAcitivity extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.species, menu);
-        MenuItem actionHelp = menu.findItem(R.id.action_about);
-        if (actionHelp != null) {
-            Drawable icon = actionHelp.getIcon();
-            if (icon != null) {
-                icon.setColorFilter(getResources().getColor(R.color.leafsnap_green), PorterDuff.Mode.MULTIPLY);
-            }
-        }
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -68,10 +59,6 @@ public class SpeciesAcitivity extends ActionBarActivity {
         switch (item.getItemId()) {
             case R.id.action_about:
                 item.setIcon(mShowingBack ? R.drawable.ic_action_about : R.drawable.ic_action_about_reverse);
-                Drawable icon = item.getIcon();
-                if (icon != null) {
-                    icon.setColorFilter(getResources().getColor(R.color.leafsnap_green), PorterDuff.Mode.MULTIPLY);
-                }
                 flipFragments();
                 return true;
             case android.R.id.home:

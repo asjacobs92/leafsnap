@@ -3,7 +3,6 @@ package edu.maryland.leafsnap.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -38,14 +37,6 @@ public class OptionsAccountActivity extends ActionBarActivity {
             username.setText(getResources().getText(R.string.not_logged_in));
         }
     }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.options, menu);
-        return true;
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {

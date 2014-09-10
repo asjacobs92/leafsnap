@@ -3,13 +3,12 @@ package edu.maryland.leafsnap.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.util.Log;
 
 import java.util.HashMap;
 
 /**
  * TODO: comment this.
- *
+ * <p/>
  * Created by Arthur Jacobs on 25/06/2014.
  */
 public class SessionManager {
@@ -60,8 +59,6 @@ public class SessionManager {
         // user name
         user.put(KEY_USERNAME, getSharedPreferences().getString(KEY_USERNAME, null));
         user.put(KEY_PASSWORD, getSharedPreferences().getString(KEY_PASSWORD, null));
-
-        Log.d("SESSION MANAGER", "User: " + user.get(KEY_USERNAME) + " passwd: " + user.get(KEY_PASSWORD));
 
         // return user
         return user;

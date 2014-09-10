@@ -1,14 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE xml>
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE menu>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="edu.maryland.leafsnap.activity.MainActivity" >
+    tools:context="edu.maryland.leafsnap.activity.MainActivity">
 
     <item
-        android:id="@+id/action_help"
-        android:icon="@drawable/ic_action_help"
-        android:title="@string/action_help"
-        app:showAsAction="always"/>
+        android:id="@+id/action_snap_it"
+        android:title="@string/title_action_snap"
+        android:icon="@drawable/ic_action_flash_on"
+        app:actionLayout="@layout/action_button_snap_it"
+        app:showAsAction="always" />
 
 </menu>
