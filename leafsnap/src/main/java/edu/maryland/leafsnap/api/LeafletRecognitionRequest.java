@@ -13,9 +13,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import edu.maryland.leafsnap.data.DatabaseHelper;
 import edu.maryland.leafsnap.model.CollectedLeaf;
+import edu.maryland.leafsnap.model.RankedSpecies;
+import edu.maryland.leafsnap.model.Species;
 
 /**
  * TODO: comment this.
@@ -27,23 +30,20 @@ public class LeafletRecognitionRequest {
     private static final String LOG_TAG = "RECOGNITION_REQUEST";
 
     private Context mContext;
-
     private boolean mSynchronous;
-
     private DatabaseHelper mDbHelper;
-
     private CollectedLeaf mCollectedLeaf;
 
     public LeafletRecognitionRequest(Context context, CollectedLeaf collectedLeaf) {
-        setContext(context);
-        setSynchronous(false);
-        setCollectedLeaf(collectedLeaf);
+        mContext = context;
+        mSynchronous = false;
+        mCollectedLeaf = collectedLeaf;
     }
 
     public LeafletRecognitionRequest(Context context, CollectedLeaf collectedLeaf, boolean synchronous) {
-        setContext(context);
-        setSynchronous(synchronous);
-        setCollectedLeaf(collectedLeaf);
+        mContext = context;
+        mSynchronous = synchronous;
+        mCollectedLeaf = collectedLeaf;
     }
 
     public void loadRecognitionResult() {
@@ -51,10 +51,10 @@ public class LeafletRecognitionRequest {
 
         RequestParams params = new RequestParams();
         params.put("fmt", "json");
-        if (isSynchronous()) {
-            LeafletSyncRestClient.get("/" + getCollectedLeaf().getLeafID() + "/results/", params, handler);
+        if (mSynchronous) {
+            LeafletSyncRestClient.get("/" + mCollectedLeaf.getLeafID() + "/results/", params, handler);
         } else {
-            LeafletAsyncRestClient.get("/" + getCollectedLeaf().getLeafID() + "/results/", params, handler);
+            LeafletAsyncRestClient.get("/" + mCollectedLeaf.getLeafID() + "/results/", params, handler);
         }
     }
 
@@ -65,6 +65,7 @@ public class LeafletRecognitionRequest {
                 super.onSuccess(statusCode, headers, response);
                 try {
                     parseResult(response);
+                    mCollectedLeaf.setUploaded(true);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 } catch (SQLException e) {
@@ -74,47 +75,41 @@ public class LeafletRecognitionRequest {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable error) {
-                Log.e(LOG_TAG, "Could not download image. Error: " + error.getMessage());
+                Log.e(LOG_TAG, "Recognition request failed. Error: " + error.getMessage());
             }
         };
     }
 
     private void parseResult(JSONObject result) throws JSONException, SQLException {
         JSONArray matches = result.getJSONArray("matches");
-        for (int i = 0; i < matches.length(); i++) {
-            
+        if (matches.length() != 0) {
+            for (int i = 0; i < matches.length(); i++) {
+                JSONObject oneMatch = matches.getJSONObject(i);
 
+                ArrayList<Species> queryResults = (ArrayList<Species>) getDbHelper().
+                        getSpeciesDao().queryForEq("scientificName", oneMatch.get("sciname"));
+                if (!queryResults.isEmpty()) {
+                    RankedSpecies rankedSpecies = new RankedSpecies(i, queryResults.get(0));
+                    rankedSpecies.setAssociatedCollection(mCollectedLeaf);
+                    getDbHelper().getRankedSpeciesDao().create(rankedSpecies);
+                }
+            }
+        } else {
+            Log.e(LOG_TAG, "Recognition request failed. Segmentation failed.");
         }
-    }
-
-    public Context getContext() {
-        return mContext;
-    }
-
-    public void setContext(Context mContext) {
-        this.mContext = mContext;
-    }
-
-    public CollectedLeaf getCollectedLeaf() {
-        return mCollectedLeaf;
-    }
-
-    public void setCollectedLeaf(CollectedLeaf mCollectedLeaf) {
-        this.mCollectedLeaf = mCollectedLeaf;
     }
 
     private DatabaseHelper getDbHelper() {
         if (mDbHelper == null) {
-            mDbHelper = OpenHelperManager.getHelper(getContext(), DatabaseHelper.class);
+            mDbHelper = OpenHelperManager.getHelper(mContext, DatabaseHelper.class);
         }
         return mDbHelper;
     }
 
-    public boolean isSynchronous() {
-        return mSynchronous;
-    }
-
-    public void setSynchronous(boolean mSynchronous) {
-        this.mSynchronous = mSynchronous;
+    public void close() {
+        if (mDbHelper != null) {
+            OpenHelperManager.releaseHelper();
+            mDbHelper = null;
+        }
     }
 }

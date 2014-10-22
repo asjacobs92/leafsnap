@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/black">
 
     <RelativeLayout
         android:id="@+id/collection_view"
@@ -13,7 +14,7 @@
             android:id="@+id/collection_list_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="start|left"
+            android:layout_gravity="start|top"
             android:alpha="0.4"
             android:background="@color/list_header_grey"
             android:padding="5dp"
@@ -23,10 +24,12 @@
 
         <ListView
             android:id="@+id/collection_list"
+            android:textColor="@color/white"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:drawSelectorOnTop="true"
             android:fastScrollEnabled="true"
+            android:dividerHeight="1px"
             android:divider="@drawable/listview_divider"
             android:listSelector="@drawable/listview_selector"
             android:layout_below="@+id/collection_list_header"

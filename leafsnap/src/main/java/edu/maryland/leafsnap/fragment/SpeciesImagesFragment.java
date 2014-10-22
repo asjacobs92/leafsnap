@@ -30,11 +30,12 @@ import edu.maryland.leafsnap.activity.SpeciesAcitivity;
 import edu.maryland.leafsnap.data.DatabaseHelper;
 import edu.maryland.leafsnap.model.LeafletUrl;
 import edu.maryland.leafsnap.model.Species;
+import edu.maryland.leafsnap.util.MediaUtils;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 public class SpeciesImagesFragment extends Fragment {
 
-    private boolean fullscreen = false;
+    private boolean mFullscreen = false;
 
     private Species mSpecies;
     private DatabaseHelper mDbHelper;
@@ -45,7 +46,7 @@ public class SpeciesImagesFragment extends Fragment {
                              Bundle savedInstanceState) {
         Bundle b = this.getArguments();
         if (b != null) {
-            setSpecies((Species) b.getSerializable(SpeciesAcitivity.ARG_SPECIES));
+            mSpecies = (Species) b.getSerializable(SpeciesAcitivity.ARG_SPECIES);
         }
         return inflater.inflate(R.layout.fragment_species_images, container, false);
     }
@@ -81,10 +82,10 @@ public class SpeciesImagesFragment extends Fragment {
         if (imageLayout != null) {
             imageDisplay.setImageDrawable(((ImageView) imageLayout.getChildAt(0))
                     .getDrawable());
-            if (getAttacher() == null) {
-                setAttacher(new PhotoViewAttacher(imageDisplay));
+            if (mAttacher == null) {
+                mAttacher = new PhotoViewAttacher(imageDisplay);
             } else {
-                getAttacher().update();
+                mAttacher.update();
             }
         }
     }
@@ -92,20 +93,16 @@ public class SpeciesImagesFragment extends Fragment {
     private void initImageDisplay() {
         setImageDisplayFirstLeaflet();
 
-        getAttacher().setOnPhotoTapListener(new PhotoViewAttacher.OnPhotoTapListener() {
+        mAttacher.setOnPhotoTapListener(new PhotoViewAttacher.OnPhotoTapListener() {
             @Override
             public void onPhotoTap(View view, float v, float v2) {
-                if (isFullscreen()) {
-                    toggleFullscreen(false);
-                } else {
-                    toggleFullscreen(true);
-                }
+                toggleFullscreen(!mFullscreen);
             }
         });
     }
 
     private void toggleFullscreen(boolean fullscreen) {
-        setFullscreen(fullscreen);
+        mFullscreen = fullscreen;
         WindowManager.LayoutParams attrs = getActivity().getWindow().getAttributes();
         if (fullscreen) {
             attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
@@ -130,9 +127,10 @@ public class SpeciesImagesFragment extends Fragment {
         LinearLayout imagePicker = (LinearLayout) getActivity().findViewById(R.id.image_picker);
         try {
             List<LeafletUrl> leafletUrls = getDbHelper().getLeafletUrlDao().queryForEq("associatedSpecies_id",
-                    getSpecies().getId());
+                    mSpecies.getId());
             for (LeafletUrl leafletUrl : leafletUrls) {
-                Drawable d = getDrawableFromUrl(leafletUrl.getRawURL().replace("/species", "species"));
+                Drawable d = MediaUtils.getDrawableFromAssets(getActivity(),
+                        leafletUrl.getRawURL().replace("/species", "species"));
                 if (d != null) {
                     imagePicker.addView(getSmallImageLayout(leafletUrl, d));
                 }
@@ -151,7 +149,7 @@ public class SpeciesImagesFragment extends Fragment {
                 ImageView imageDisplay = (ImageView) getActivity().findViewById(R.id.image_display);
                 imageDisplay.setImageDrawable(((ImageView) view)
                         .getDrawable());
-                getAttacher().update();
+                mAttacher.update();
                 return true;
             }
         });
@@ -184,44 +182,10 @@ public class SpeciesImagesFragment extends Fragment {
         return leafletType;
     }
 
-    private Drawable getDrawableFromUrl(String url) {
-        InputStream ims = null;
-        try {
-            ims = getActivity().getAssets().open(url);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return Drawable.createFromStream(ims, null);
-    }
-
     private DatabaseHelper getDbHelper() {
         if (mDbHelper == null) {
             mDbHelper = OpenHelperManager.getHelper(getActivity(), DatabaseHelper.class);
         }
         return mDbHelper;
-    }
-
-    private PhotoViewAttacher getAttacher() {
-        return mAttacher;
-    }
-
-    private void setAttacher(PhotoViewAttacher mAttacher) {
-        this.mAttacher = mAttacher;
-    }
-
-    private Species getSpecies() {
-        return mSpecies;
-    }
-
-    private void setSpecies(Species mSpecies) {
-        this.mSpecies = mSpecies;
-    }
-
-    private boolean isFullscreen() {
-        return fullscreen;
-    }
-
-    private void setFullscreen(boolean fullscreen) {
-        this.fullscreen = fullscreen;
     }
 }

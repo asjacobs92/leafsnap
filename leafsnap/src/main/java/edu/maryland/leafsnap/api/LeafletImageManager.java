@@ -43,6 +43,13 @@ public class LeafletImageManager {
         return mDbHelper;
     }
 
+    public void close() {
+        if (mDbHelper != null) {
+            OpenHelperManager.releaseHelper();
+            mDbHelper = null;
+        }
+    }
+
     private class ProgressTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... arg0) {

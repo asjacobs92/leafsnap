@@ -28,14 +28,13 @@ import edu.maryland.leafsnap.model.Species;
  */
 public class LeafletUserCollectionRequest {
 
-    private boolean mFinished;
-
     private Context mContext;
-
+    private boolean mFinished;
     private DatabaseHelper mDbHelper;
 
     public LeafletUserCollectionRequest(Context context) {
-        setContext(context);
+        setFinished(false);
+        mContext = context;
     }
 
     public void updateUserCollectionSyncStatus(String username) {
@@ -85,7 +84,8 @@ public class LeafletUserCollectionRequest {
 
             getDbHelper().getCollectedLeafDao().create(collectedLeaf);
 
-            LeafletRecognitionRequest recognitionRequest = new LeafletRecognitionRequest(getContext(), collectedLeaf, true);
+            LeafletRecognitionRequest recognitionRequest =
+                    new LeafletRecognitionRequest(mContext, collectedLeaf, false);
             recognitionRequest.loadRecognitionResult();
         }
     }
@@ -114,7 +114,7 @@ public class LeafletUserCollectionRequest {
         getDbHelper().getLeafletUrlDao().create(segmentedLeafletUrl);
         collectedLeaf.setSegmentedImageURL(segmentedLeafletUrl);
 
-        LeafletImageLoader imageLoader = new LeafletImageLoader(getContext(), segmentedLeafletUrl);
+        LeafletImageLoader imageLoader = new LeafletImageLoader(mContext, segmentedLeafletUrl);
         imageLoader.loadImage();
 
         return collectedLeaf;
@@ -130,7 +130,7 @@ public class LeafletUserCollectionRequest {
         getDbHelper().getLeafletUrlDao().create(originalLeafletUrl);
         collectedLeaf.setOriginalImageURL(originalLeafletUrl);
 
-        LeafletImageLoader imageLoader = new LeafletImageLoader(getContext(), originalLeafletUrl);
+        LeafletImageLoader imageLoader = new LeafletImageLoader(mContext, originalLeafletUrl);
         imageLoader.loadImage();
 
         return collectedLeaf;
@@ -163,26 +163,25 @@ public class LeafletUserCollectionRequest {
         return collectedLeaf;
     }
 
-    private Context getContext() {
-        return mContext;
+    private DatabaseHelper getDbHelper() {
+        if (mDbHelper == null) {
+            mDbHelper = OpenHelperManager.getHelper(mContext, DatabaseHelper.class);
+        }
+        return mDbHelper;
     }
 
-    private void setContext(Context mContext) {
-        this.mContext = mContext;
+    public void close() {
+        if (mDbHelper != null) {
+            OpenHelperManager.releaseHelper();
+            mDbHelper = null;
+        }
     }
 
     public boolean isFinished() {
         return mFinished;
     }
 
-    public void setFinished(boolean finished) {
-        this.mFinished = finished;
-    }
-
-    private DatabaseHelper getDbHelper() {
-        if (mDbHelper == null) {
-            mDbHelper = OpenHelperManager.getHelper(getContext(), DatabaseHelper.class);
-        }
-        return mDbHelper;
+    public void setFinished(boolean mFinished) {
+        this.mFinished = mFinished;
     }
 }

@@ -43,6 +43,7 @@ public class LeafletDatabaseContentRequest {
                     parseResult(response);
                     LeafletImageManager imageManager = new LeafletImageManager(getContext());
                     imageManager.consolidateDatabase();
+                    imageManager.close();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 } catch (SQLException e) {
@@ -234,5 +235,12 @@ public class LeafletDatabaseContentRequest {
             mDbHelper = OpenHelperManager.getHelper(getContext(), DatabaseHelper.class);
         }
         return mDbHelper;
+    }
+
+    public void close() {
+        if (mDbHelper != null) {
+            OpenHelperManager.releaseHelper();
+            mDbHelper = null;
+        }
     }
 }

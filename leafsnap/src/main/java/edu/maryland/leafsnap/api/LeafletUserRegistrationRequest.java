@@ -21,7 +21,8 @@ import edu.maryland.leafsnap.util.SessionManager;
  * Created by Arthur Jacobs on 03/07/2014.
  */
 public class LeafletUserRegistrationRequest {
-    private final static String ACCOUNT_DEFAULT_FAIL_MSG = "Account operation failed.";
+    private final static String ACCOUNT_DEFAULT_FAIL_MSG = "Account operation failed," +
+            " most likely due to lack of connectivity.";
     private final static String ACCOUNT_CREATE_SUCCESS = "Account successfully created.";
 
     private boolean mFinished;
@@ -32,7 +33,7 @@ public class LeafletUserRegistrationRequest {
     private SessionManager mSessionManager;
 
     public LeafletUserRegistrationRequest(Context context) {
-        this.setContext(context);
+        mContext = context;
     }
 
     public boolean isAccountRegistered() {
@@ -99,7 +100,7 @@ public class LeafletUserRegistrationRequest {
                 setFinished(true);
                 setSuccessful(false);
                 setResponseMessage(ACCOUNT_DEFAULT_FAIL_MSG);
-                Log.d("CREATE ACCOUNT", errorResponse.toString());
+                Log.d("CREATE ACCOUNT", ACCOUNT_DEFAULT_FAIL_MSG);
             }
         });
     }
@@ -140,7 +141,7 @@ public class LeafletUserRegistrationRequest {
                 setFinished(true);
                 setSuccessful(false);
                 setResponseMessage(ACCOUNT_DEFAULT_FAIL_MSG);
-                Log.d("UPDATE ACCOUNT", errorResponse.toString());
+                Log.d("UPDATE ACCOUNT", ACCOUNT_DEFAULT_FAIL_MSG);
             }
         });
     }
@@ -179,7 +180,7 @@ public class LeafletUserRegistrationRequest {
                 setFinished(true);
                 setSuccessful(false);
                 setResponseMessage(ACCOUNT_DEFAULT_FAIL_MSG);
-                Log.d("VERIFY ACCOUNT", errorResponse.toString());
+                Log.d("VERIFY ACCOUNT", ACCOUNT_DEFAULT_FAIL_MSG);
             }
         });
     }
@@ -208,17 +209,9 @@ public class LeafletUserRegistrationRequest {
         this.mResponseMessage = responseMessage;
     }
 
-    public Context getContext() {
-        return mContext;
-    }
-
-    public void setContext(Context mContext) {
-        this.mContext = mContext;
-    }
-
     public SessionManager getSessionManager() {
         if (mSessionManager == null) {
-            mSessionManager = new SessionManager(getContext());
+            mSessionManager = new SessionManager(mContext);
         }
         return mSessionManager;
     }

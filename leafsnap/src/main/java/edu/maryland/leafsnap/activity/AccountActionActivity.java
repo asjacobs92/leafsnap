@@ -46,7 +46,6 @@ public class AccountActionActivity extends ActionBarActivity {
     private LeafletUserRegistrationRequest mUserRequest;
     private LeafletUserCollectionRequest mCollectionRequest;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,8 +54,8 @@ public class AccountActionActivity extends ActionBarActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        setAccountAction((AccountAction) this.getIntent().getSerializableExtra(ACTION_ARG));
-        switch (getAccountAction()) {
+        mAccountAction = (AccountAction) getIntent().getSerializableExtra(ACTION_ARG);
+        switch (mAccountAction) {
             case CREATE:
                 setupAccountActionView(getResources().getText(R.string.new_account).toString(),
                         getResources().getText(R.string.create_account).toString());
@@ -92,21 +91,21 @@ public class AccountActionActivity extends ActionBarActivity {
 
     public void onActionButtonClick(View view) {
         HashMap<String, String> user = getUserFromInput();
-
+        mUserRequest = new LeafletUserRegistrationRequest(this);
         if (user != null) {
-            switch (getAccountAction()) {
+            switch (mAccountAction) {
                 case CREATE:
-                    getUserRequest().registerAccount(user.get(KEY_USERNAME), user.get(KEY_PASSWORD));
+                    mUserRequest.registerAccount(user.get(KEY_USERNAME), user.get(KEY_PASSWORD));
                     break;
                 case UPDATE:
-                    if (getUserRequest().isAccountRegistered()) {
-                        getUserRequest().updateAccount(user.get(KEY_USERNAME), user.get(KEY_PASSWORD));
+                    if (mUserRequest.isAccountRegistered()) {
+                        mUserRequest.updateAccount(user.get(KEY_USERNAME), user.get(KEY_PASSWORD));
                     } else {
                         Toast.makeText(this, R.string.login_warning, Toast.LENGTH_SHORT).show();
                     }
                     break;
                 case VERIFY:
-                    getUserRequest().verifyAccount(user.get(KEY_USERNAME), user.get(KEY_PASSWORD));
+                    mUserRequest.verifyAccount(user.get(KEY_USERNAME), user.get(KEY_PASSWORD));
                     break;
                 default:
                     break;
@@ -142,12 +141,12 @@ public class AccountActionActivity extends ActionBarActivity {
         accountStatusCheckmark.setVisibility(View.VISIBLE);
         accountStatusView.setVisibility(View.VISIBLE);
 
-        accountStatusView.setText(getUserRequest().getResponseMessage());
+        accountStatusView.setText(mUserRequest.getResponseMessage());
         accountStatusCheckmark.setImageDrawable(getResources().getDrawable(
-                getUserRequest().wasSuccessful() ? R.drawable.check_right : R.drawable.check_wrong));
+                mUserRequest.wasSuccessful() ? R.drawable.check_right : R.drawable.check_wrong));
 
-        if (getAccountAction() == AccountAction.VERIFY
-                && getUserRequest().wasSuccessful()) {
+        if (mAccountAction == AccountAction.VERIFY
+                && mUserRequest.wasSuccessful()) {
             syncUserCollection();
         }
     }
@@ -159,7 +158,8 @@ public class AccountActionActivity extends ActionBarActivity {
 
         deleteLocalCollection();
         String username = getSessionManager().getCurrentUser().get(SessionManager.KEY_USERNAME);
-        getCollectionRequest().updateUserCollectionSyncStatus(username);
+        mCollectionRequest = new LeafletUserCollectionRequest(this);
+        mCollectionRequest.updateUserCollectionSyncStatus(username);
         new CollectionSyncTask().execute();
     }
 
@@ -192,14 +192,6 @@ public class AccountActionActivity extends ActionBarActivity {
         }
     }
 
-    private AccountAction getAccountAction() {
-        return mAccountAction;
-    }
-
-    private void setAccountAction(AccountAction accountAction) {
-        this.mAccountAction = accountAction;
-    }
-
     private SessionManager getSessionManager() {
         if (mSessionManager == null) {
             mSessionManager = new SessionManager(this);
@@ -207,24 +199,9 @@ public class AccountActionActivity extends ActionBarActivity {
         return mSessionManager;
     }
 
-    private LeafletUserRegistrationRequest getUserRequest() {
-        if (mUserRequest == null) {
-            mUserRequest = new LeafletUserRegistrationRequest(this);
-        }
-        return mUserRequest;
-    }
-
-    private LeafletUserCollectionRequest getCollectionRequest() {
-        if (mCollectionRequest == null) {
-            mCollectionRequest = new LeafletUserCollectionRequest(this);
-        }
-        return mCollectionRequest;
-    }
-
-
     private DatabaseHelper getDbHelper() {
         if (mDbHelper == null) {
-            mDbHelper = new DatabaseHelper(this);
+            mDbHelper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
         }
         return mDbHelper;
     }
@@ -236,6 +213,11 @@ public class AccountActionActivity extends ActionBarActivity {
         if (mDbHelper != null) {
             OpenHelperManager.releaseHelper();
             mDbHelper = null;
+        }
+
+        if (mCollectionRequest != null) {
+            mCollectionRequest.close();
+            mCollectionRequest = null;
         }
     }
 
@@ -252,7 +234,7 @@ public class AccountActionActivity extends ActionBarActivity {
 
         @Override
         protected Void doInBackground(Void... arg0) {
-            while (!getUserRequest().isFinished()) {
+            while (!mUserRequest.isFinished()) {
                 SystemClock.sleep(100);
             }
             runOnUiThread(new Runnable() {
@@ -279,7 +261,7 @@ public class AccountActionActivity extends ActionBarActivity {
 
         @Override
         protected Void doInBackground(Void... arg0) {
-            while (!getCollectionRequest().isFinished()) {
+            while (!mCollectionRequest.isFinished()) {
                 SystemClock.sleep(100);
             }
             runOnUiThread(new Runnable() {
@@ -296,6 +278,4 @@ public class AccountActionActivity extends ActionBarActivity {
             setSupportProgressBarIndeterminateVisibility(false);
         }
     }
-
-
 }

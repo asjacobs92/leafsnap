@@ -20,8 +20,10 @@ import java.util.Date;
 
 import edu.maryland.leafsnap.R;
 import edu.maryland.leafsnap.model.CollectedLeaf;
+import edu.maryland.leafsnap.util.MediaUtils;
 
 /**
+ * TODO
  * @author Arthur Jacobs
  */
 public class CollectionListAdapter extends ArrayAdapter<CollectedLeaf> {
@@ -68,36 +70,12 @@ public class CollectionListAdapter extends ArrayAdapter<CollectedLeaf> {
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date date = collectedLeaf.getCollectedDate();
-        holder.subtext.setText(getContext().getString(R.string.collected) +
+        holder.subtext.setText(getContext().getString(R.string.collected) + " " +
                 dateFormat.format(date));
-        holder.image.setImageDrawable(getDrawableFromUrl(
+        holder.image.setImageDrawable(MediaUtils.getDrawableFromExternalStorage(getContext(),
                 collectedLeaf.getOriginalImageURL().getRawURL()));
 
         return convertView;
-    }
-
-    private Drawable getDrawableFromUrl(String url) {
-        InputStream ims = null;
-        try {
-            if (isExternalStorageReadable()) {
-                File imageFile = new File(getContext().getExternalFilesDir(
-                        Environment.DIRECTORY_PICTURES), url);
-                ims = new FileInputStream(imageFile);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return Drawable.createFromStream(ims, null);
-    }
-
-    /* Checks if external storage is available to at least read */
-    public boolean isExternalStorageReadable() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state) ||
-                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-            return true;
-        }
-        return false;
     }
 
     public LayoutInflater getLayoutInflater() {

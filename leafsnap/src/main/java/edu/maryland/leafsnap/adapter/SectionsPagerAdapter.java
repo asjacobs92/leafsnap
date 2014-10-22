@@ -17,7 +17,7 @@ import edu.maryland.leafsnap.util.TabUtils;
  */
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-    private final Fragment[] mFragments;
+    private Fragment[] mFragments;
     private Context mContext;
 
     public SectionsPagerAdapter(Context context, FragmentManager fm, Fragment[] fragments) {

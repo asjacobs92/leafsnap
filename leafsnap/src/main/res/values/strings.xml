@@ -58,5 +58,14 @@
     <string name="user_collection">\'s Collection</string>
     <string name="unlabeled_species">Unlabeled species</string>
     <string name="collected">Collected </string>
+    <string name="title_activity_camera">CameraActivity</string>
+    <string name="title_activity_camera_activity2">CameraActivity2</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="white_bg_instr">Place leaf on a white background.</string>
+    <string name="center_leaf_instr">Center leaf in the frame.</string>
+    <string name="gallery">Gallery</string>
+    <string name="cancel">Cancel</string>
+    <string name="title_activity_upload_image_activty">UploadImageActivty</string>
 
 </resources>

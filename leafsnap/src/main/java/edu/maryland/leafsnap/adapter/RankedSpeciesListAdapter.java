@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import edu.maryland.leafsnap.R;
 import edu.maryland.leafsnap.model.RankedSpecies;
 import edu.maryland.leafsnap.model.Species;
+import edu.maryland.leafsnap.util.MediaUtils;
 
 /**
  * @author Arthur Jacobs
@@ -58,38 +59,13 @@ public class RankedSpeciesListAdapter extends ArrayAdapter<RankedSpecies> {
         }
 
         Species species = getItem(position).getSpecies();
-        holder.index.setText(getItem(position).getRank());
+        holder.index.setText("" + getItem(position).getRank());
         holder.text.setText(species.getCommomName());
         holder.subtext.setText(species.getScientificName());
-        holder.image.setImageDrawable(getDrawableFromUrl(
-                species.getExampleImageFlower().getRawURL().replace("/species", "species").split("\\?")[0]));
+        holder.image.setImageDrawable(MediaUtils.getDrawableFromAssets(getContext(),
+                species.getExampleImageLeaf().getRawURL().replace("/species", "species").split("\\?")[0]));
 
         return convertView;
-    }
-
-    private Drawable getDrawableFromUrl(String url) {
-        InputStream ims = null;
-        try {
-            ims = getContext().getAssets().open(url);
-            /*if (isExternalStorageReadable()) {
-                File imageFile = new File(getContext().getExternalFilesDir(
-                        Environment.DIRECTORY_PICTURES), url);
-                ims = new FileInputStream(imageFile);
-            }*/
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return Drawable.createFromStream(ims, null);
-    }
-
-    /* Checks if external storage is available to at least read */
-    public boolean isExternalStorageReadable() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state) ||
-                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-            return true;
-        }
-        return false;
     }
 
     public LayoutInflater getLayoutInflater() {

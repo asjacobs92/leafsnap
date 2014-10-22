@@ -48,11 +48,11 @@ public class OptionsAccountActivity extends ActionBarActivity {
         }
     }
 
-    public void onNewAccountButtonClick(View view) {
+    /*public void onNewAccountButtonClick(View view) {
         Intent intent = new Intent(this, AccountActionActivity.class);
         intent.putExtra(AccountActionActivity.ACTION_ARG, AccountActionActivity.AccountAction.CREATE);
         this.startActivity(intent);
-    }
+    }*/
 
     public void onChangeUsernameButtonClick(View view) {
         Intent intent = new Intent(this, AccountActionActivity.class);

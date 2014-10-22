@@ -33,22 +33,15 @@ import edu.maryland.leafsnap.model.Species;
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     private static final String TAG = "DATABASE";
-
     private static final int DATABASE_VERSION = 1;
+    private static final String ASSET_DB_PATH = "databases";
     private static final String DATABASE_NAME = "Leaflet-Master";
 
-    private static final String ASSET_DB_PATH = "databases";
-    //private static final String ASSET_SPECIES_PATH = "species";
-
     private Context mContext;
-
-    private SQLiteDatabase mDatabase;
-
     private String mAssetPath;
-
     private String mDatabasePath;
-
-    private boolean mIsInitializing;
+    private boolean mInitializing;
+    private SQLiteDatabase mDatabase;
 
     private Dao<Species, Integer> speciesDao;
     private Dao<LeafletUrl, Integer> leafletUrlDao;
@@ -58,9 +51,9 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION, R.raw.ormlite_config);
-        setContext(context);
-        setAssetPath(ASSET_DB_PATH + "/" + DATABASE_NAME);
-        setDatabasePath(context.getApplicationInfo().dataDir + "/databases");
+        mContext = context;
+        mAssetPath = ASSET_DB_PATH + "/" + DATABASE_NAME;
+        mDatabasePath = context.getApplicationInfo().dataDir + "/databases";
     }
 
     @Override
@@ -95,11 +88,11 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     @Override
     public synchronized SQLiteDatabase getWritableDatabase() {
-        if (getDatabase() != null && getDatabase().isOpen() && !getDatabase().isReadOnly()) {
-            return getDatabase();  // The database is already open for business
+        if (mDatabase != null && mDatabase.isOpen() && !mDatabase.isReadOnly()) {
+            return mDatabase;  // The database is already open for business
         }
 
-        if (isInitializing()) {
+        if (mInitializing) {
             throw new IllegalStateException("getWritableDatabase called recursively");
         }
 
@@ -112,19 +105,19 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         boolean success = false;
         SQLiteDatabase db = null;
         try {
-            setIsInitializing(true);
+            mInitializing = true;
             db = createOrOpenDatabase();
 
             onOpen(db);
             success = true;
             return db;
         } finally {
-            setIsInitializing(false);
+            mInitializing = false;
             if (success) {
-                if (getDatabase() != null) {
-                    getDatabase().close();
+                if (mDatabase != null) {
+                    mDatabase.close();
                 }
-                setDatabase(db);
+                mDatabase = db;
             } else {
                 if (db != null) db.close();
             }
@@ -133,11 +126,11 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     @Override
     public synchronized SQLiteDatabase getReadableDatabase() {
-        if (getDatabase() != null && getDatabase().isOpen()) {
-            return getDatabase();  // The database is already open for business
+        if (mDatabase != null && mDatabase.isOpen()) {
+            return mDatabase;  // The database is already open for business
         }
 
-        if (isInitializing()) {
+        if (mInitializing) {
             throw new IllegalStateException("getReadableDatabase called recursively");
         }
 
@@ -149,17 +142,17 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
         SQLiteDatabase db = null;
         try {
-            setIsInitializing(true);
-            String path = getContext().getDatabasePath(DATABASE_NAME).getPath();
+            mInitializing = true;
+            String path = mContext.getDatabasePath(DATABASE_NAME).getPath();
             db = SQLiteDatabase.openDatabase(path, null, SQLiteDatabase.OPEN_READONLY);
 
             onOpen(db);
             Log.w(TAG, "Opened " + DATABASE_NAME + " in read-only mode");
-            setDatabase(db);
-            return getDatabase();
+            mDatabase = db;
+            return mDatabase;
         } finally {
-            setIsInitializing(false);
-            if (db != null && db != getDatabase()) db.close();
+            mInitializing = false;
+            if (db != null && db != mDatabase) db.close();
         }
     }
 
@@ -168,11 +161,11 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
      */
     @Override
     public synchronized void close() {
-        if (isInitializing()) throw new IllegalStateException("Closed during initialization");
+        if (mInitializing) throw new IllegalStateException("Closed during initialization");
 
-        if (getDatabase() != null && getDatabase().isOpen()) {
-            getDatabase().close();
-            setDatabase(null);
+        if (mDatabase != null && mDatabase.isOpen()) {
+            mDatabase.close();
+            mDatabase = null;
         }
     }
 
@@ -180,7 +173,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         // test for the existence of the db file first and don't attempt open
         // to prevent the error trace in log on API 14+
         SQLiteDatabase db = null;
-        File file = new File(getDatabasePath() + "/" + DATABASE_NAME);
+        File file = new File(mDatabasePath+ "/" + DATABASE_NAME);
         if (file.exists()) {
             db = returnDatabase();
         }
@@ -197,7 +190,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     private SQLiteDatabase returnDatabase() {
         try {
-            SQLiteDatabase db = SQLiteDatabase.openDatabase(getDatabasePath() + "/" + DATABASE_NAME, null, SQLiteDatabase.OPEN_READWRITE);
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(mDatabasePath + "/" + DATABASE_NAME, null, SQLiteDatabase.OPEN_READWRITE);
             Log.i(TAG, "successfully opened database " + DATABASE_NAME);
             return db;
         } catch (SQLiteException e) {
@@ -207,48 +200,23 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     }
 
     private void copyDatabaseFromAssets() {
-        Log.w(TAG, "copying database from assets...");
+        Log.w(TAG, "Copying database from assets...");
 
         InputStream is;
         try {
-            is = getContext().getAssets().open(getAssetPath());
-            File f = new File(getDatabasePath() + "/");
+            is = mContext.getAssets().open(mAssetPath);
+            File f = new File(mDatabasePath + "/");
             if (!f.exists()) {
                 f.mkdir();
             }
 
-            writeFileToDisk(is, new FileOutputStream(getDatabasePath() + "/" + DATABASE_NAME));
+            writeFileToDisk(is, new FileOutputStream(mDatabasePath + "/" + DATABASE_NAME));
 
             Log.w(TAG, "database copy complete");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
-    /*private void copyAssetsToExternalStorage(String path) {
-        AssetManager assetManager = getContext().getAssets();
-        String assets[];
-        try {
-            assets = assetManager.list(path);
-            if (assets.length == 0) {
-                InputStream is = getContext().getAssets().open(path);
-                File outFile = new File(getContext().getExternalFilesDir(
-                        Environment.DIRECTORY_PICTURES), path);
-                OutputStream os = new FileOutputStream(outFile);
-                writeFileToDisk(is, os);
-            } else {
-                File dir = new File(getContext().getExternalFilesDir(
-                        Environment.DIRECTORY_PICTURES), path);
-                if (!dir.exists())
-                    dir.mkdir();
-                for (int i = 0; i < assets.length; ++i) {
-                    copyAssetsToExternalStorage(path + "/" + assets[i]);
-                }
-            }
-        } catch (IOException ex) {
-            Log.e("TAG", "I/O Exception", ex);
-        }
-    }*/
 
     private void writeFileToDisk(InputStream in, OutputStream outs) throws IOException {
         byte[] buffer = new byte[1024];
@@ -294,45 +262,5 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             collectedLeafDao = getDao(CollectedLeaf.class);
         }
         return collectedLeafDao;
-    }
-
-    private Context getContext() {
-        return mContext;
-    }
-
-    private void setContext(Context mContext) {
-        this.mContext = mContext;
-    }
-
-    private String getDatabasePath() {
-        return mDatabasePath;
-    }
-
-    private void setDatabasePath(String mDatabasePath) {
-        this.mDatabasePath = mDatabasePath;
-    }
-
-    private String getAssetPath() {
-        return mAssetPath;
-    }
-
-    private void setAssetPath(String mAssetPath) {
-        this.mAssetPath = mAssetPath;
-    }
-
-    private SQLiteDatabase getDatabase() {
-        return mDatabase;
-    }
-
-    private void setDatabase(SQLiteDatabase mDatabase) {
-        this.mDatabase = mDatabase;
-    }
-
-    private boolean isInitializing() {
-        return mIsInitializing;
-    }
-
-    private void setIsInitializing(boolean mIsInitializing) {
-        this.mIsInitializing = mIsInitializing;
     }
 }

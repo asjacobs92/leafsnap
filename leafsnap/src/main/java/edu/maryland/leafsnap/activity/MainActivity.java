@@ -1,5 +1,6 @@
 package edu.maryland.leafsnap.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -11,14 +12,15 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import edu.maryland.leafsnap.R;
 import edu.maryland.leafsnap.adapter.SectionsPagerAdapter;
-import edu.maryland.leafsnap.api.LeafletDatabaseContentRequest;
 import edu.maryland.leafsnap.fragment.BrowseFragment;
 import edu.maryland.leafsnap.fragment.CollectionFragment;
 import edu.maryland.leafsnap.fragment.HomeFragment;
 import edu.maryland.leafsnap.fragment.OptionsFragment;
+import edu.maryland.leafsnap.util.MediaUtils;
 import edu.maryland.leafsnap.util.TabUtils;
 
 /**
@@ -28,8 +30,12 @@ import edu.maryland.leafsnap.util.TabUtils;
  */
 public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {
 
-    private final Fragment[] mFragments = {new HomeFragment(), new BrowseFragment(), new CollectionFragment(),
-            new OptionsFragment()};
+    private static final Fragment[] mFragments = {
+            new HomeFragment(),
+            new BrowseFragment(),
+            new CollectionFragment(),
+            new OptionsFragment()
+    };
     private ViewPager mViewPager;
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
@@ -64,16 +70,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         });
     }
 
-    /*private View getTabCustomView(int i) {
-        View tabView = getLayoutInflater().inflate(R.layout.actionbar_tab, null);
-        TextView tabText = (TextView) tabView.findViewById(R.id.tab_text);
-        if (tabText != null) {
-            tabText.setText(TabUtils.getTabTitleId(i));
-            tabText.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(TabUtils.getTabIconId(i)), null, null);
-        }
-        return tabView;
-    }*/
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
@@ -90,33 +86,31 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return (item.getItemId() == R.id.action_snap_it) && super.onOptionsItemSelected(item);
+        switch (item.getItemId()) {
+            case R.id.action_snap_it:
+                if (MediaUtils.isExternalStorageWritable()) {
+                    Intent intent = new Intent(this, CameraActivity.class);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(this, "External Storage not available.",
+                            Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-       /* View tabView = tab.getCustomView();
-        TextView tabText = (TextView) tabView.findViewById(R.id.tab_text);
-        tabText.setTextColor(getResources().getColor(R.color.leafsnap_green));
-        Drawable tabIcon = getResources().getDrawable(TabUtils.getTabIconId(tab.getPosition()));
-        tabIcon.setColorFilter(getResources().getColor(R.color.leafsnap_green), PorterDuff.Mode.MULTIPLY);
-        tabText.setCompoundDrawablesWithIntrinsicBounds(null, tabIcon, null, null);*/
-
         mViewPager.setCurrentItem(tab.getPosition());
     }
 
     @Override
     public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-        /*View tabView = tab.getCustomView();
-        TextView tabText = (TextView) tabView.findViewById(R.id.tab_text);
-        tabText.setTextColor(getResources().getColor(R.color.leafsnap_grey));
-        Drawable tabIcon = getResources().getDrawable(TabUtils.getTabIconId(tab.getPosition()));
-        tabIcon.setColorFilter(getResources().getColor(R.color.leafsnap_grey), PorterDuff.Mode.MULTIPLY);
-        tabText.setCompoundDrawablesWithIntrinsicBounds(null, tabIcon, null, null);*/
     }
 
     @Override
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-        // TODO
     }
 }

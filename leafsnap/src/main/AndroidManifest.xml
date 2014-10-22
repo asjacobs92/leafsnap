@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="edu.maryland.leafsnap" >
 
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.screen.portrait" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -59,8 +63,24 @@
         </activity>
         <activity
             android:name=".activity.CollectedLeafActivity"
-            android:label="@string/title_activity_collected_leaf"
-            android:parentActivityName=".activity.MainActivity" >
+            android:label="@string/title_activity_collected_leaf" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="edu.maryland.leafsnap.activity.MainActivity" />
+        </activity>
+        <activity
+            android:name=".activity.CameraActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_camera"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="edu.maryland.leafsnap.activity.MainActivity" />
+        </activity>
+        <activity
+            android:name=".activity.UploadImageActivty"
+            android:label="@string/title_activity_upload_image_activty" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="edu.maryland.leafsnap.activity.MainActivity" />

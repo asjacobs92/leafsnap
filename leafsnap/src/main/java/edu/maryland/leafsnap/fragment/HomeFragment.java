@@ -23,26 +23,24 @@ import java.util.HashMap;
 import edu.maryland.leafsnap.R;
 import edu.maryland.leafsnap.data.DatabaseHelper;
 import edu.maryland.leafsnap.model.Species;
+import edu.maryland.leafsnap.util.MediaUtils;
 
 public class HomeFragment extends Fragment {
 
     private static final int ANIMATION_LENGTH_MILLI = 6000;
     private static final int ANIMATION_FADE_LENGTH_MILLI = 3000;
 
-    private DatabaseHelper mDbHelper = null;
-    private HashMap<Drawable, String> mRandThumbnails = null;
+    private DatabaseHelper mDbHelper;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mRandThumbnails = new HashMap<Drawable, String>();
-        mDbHelper = OpenHelperManager.getHelper(getActivity(), DatabaseHelper.class);
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        ImageView randThumbnail = (ImageView) getActivity().findViewById(R.id.rand_thumb);
+        /*ImageView randThumbnail = (ImageView) getActivity().findViewById(R.id.rand_thumb);
 
         AnimationDrawable animation = initRandomImageAnimation();
         animation.start();
@@ -55,7 +53,7 @@ public class HomeFragment extends Fragment {
                 int visibility = isThumbnailTextVisible(randThumbnailText) ? View.INVISIBLE : View.VISIBLE;
                 randThumbnailText.setVisibility(visibility);
             }
-        });
+        });*/
     }
 
     private AnimationDrawable initRandomImageAnimation() {
@@ -81,16 +79,9 @@ public class HomeFragment extends Fragment {
         for (Species oneSpecies : speciesList) {
             ArrayList<String> exampleImageUrls = getExampleImageUrls(oneSpecies);
             for (String url : exampleImageUrls) {
-                Drawable d = null;
-                try {
-                    InputStream ims = getActivity().getAssets().open(url);
-                    d = Drawable.createFromStream(ims, null);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                Drawable d = MediaUtils.getDrawableFromAssets(getActivity(), url);
 
                 if (d != null) {
-                    mRandThumbnails.put(d, oneSpecies.getScientificName());
                     imagesList.add(d);
                 }
             }
@@ -109,8 +100,8 @@ public class HomeFragment extends Fragment {
     private ArrayList<Species> getSpeciesList() {
         ArrayList<Species> speciesList = null;
         try {
-            speciesList = (ArrayList<Species>) mDbHelper.getSpeciesDao().queryBuilder().orderByRaw("RANDOM()")
-                    .limit(10L).query();
+            speciesList = (ArrayList<Species>) getDbHelper().getSpeciesDao().
+                    queryBuilder().orderByRaw("RANDOM()").limit(10L).query();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -121,14 +112,11 @@ public class HomeFragment extends Fragment {
         return randThumbnailText.getVisibility() == View.VISIBLE;
     }
 
-    /* Checks if external storage is available to at least read */
-    public boolean isExternalStorageReadable() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state) ||
-                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-            return true;
+    private DatabaseHelper getDbHelper() {
+        if (mDbHelper == null) {
+            mDbHelper = OpenHelperManager.getHelper(getActivity(), DatabaseHelper.class);
         }
-        return false;
+        return mDbHelper;
     }
 
     @Override
