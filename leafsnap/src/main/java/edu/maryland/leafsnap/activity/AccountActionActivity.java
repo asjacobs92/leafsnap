@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -14,17 +13,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.j256.ormlite.android.apptools.OpenHelperManager;
-import com.j256.ormlite.table.TableUtils;
-
-import java.sql.SQLException;
 import java.util.HashMap;
 
 import edu.maryland.leafsnap.R;
 import edu.maryland.leafsnap.api.LeafletUserCollectionRequest;
 import edu.maryland.leafsnap.api.LeafletUserRegistrationRequest;
-import edu.maryland.leafsnap.data.DatabaseHelper;
-import edu.maryland.leafsnap.model.CollectedLeaf;
 import edu.maryland.leafsnap.util.SessionManager;
 
 
@@ -39,12 +32,20 @@ public class AccountActionActivity extends ActionBarActivity {
     public static final String KEY_USERNAME = "username";
     public static final String KEY_PASSWORD = "password";
 
+    private EditText mUsernameEditText;
+    private EditText mPasswordEditText;
+
+    private TextView mAccountStatusView;
+    private ImageView mAccountStatusCheckMark;
+
+    private TextView mCollectionStatusView;
+    private ImageView mCollectionStatusCheckMark;
+
+    private Button mAccountActionButton;
+    private TextView mAccountActionView;
+
     private AccountAction mAccountAction;
     private SessionManager mSessionManager;
-
-    private DatabaseHelper mDbHelper;
-    private LeafletUserRegistrationRequest mUserRequest;
-    private LeafletUserCollectionRequest mCollectionRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +54,18 @@ public class AccountActionActivity extends ActionBarActivity {
         setContentView(R.layout.activity_account_action);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        mUsernameEditText = (EditText) findViewById(R.id.username_input);
+        mPasswordEditText = (EditText) findViewById(R.id.password_input);
+
+        mAccountActionView = (TextView) findViewById(R.id.account_action);
+        mAccountActionButton = (Button) findViewById(R.id.action_button);
+
+        mAccountStatusView = (TextView) findViewById(R.id.account_status);
+        mAccountStatusCheckMark = (ImageView) findViewById(R.id.account_status_checkmark);
+
+        mCollectionStatusView = (TextView) findViewById(R.id.collection_status);
+        mCollectionStatusCheckMark = (ImageView) findViewById(R.id.collection_status_checkmark);
 
         mAccountAction = (AccountAction) getIntent().getSerializableExtra(ACTION_ARG);
         switch (mAccountAction) {
@@ -76,53 +89,29 @@ public class AccountActionActivity extends ActionBarActivity {
     }
 
     private void setupCurrentUserInfo() {
-        EditText usernameEditText = (EditText) findViewById(R.id.username_input);
-        EditText passwordEditText = (EditText) findViewById(R.id.password_input);
-        usernameEditText.setText(getSessionManager().getCurrentUser().get(SessionManager.KEY_USERNAME));
-        passwordEditText.setText(getSessionManager().getCurrentUser().get(SessionManager.KEY_PASSWORD));
+        mUsernameEditText.setText(getSessionManager().getCurrentUser().get(SessionManager.KEY_USERNAME));
+        mPasswordEditText.setText(getSessionManager().getCurrentUser().get(SessionManager.KEY_PASSWORD));
     }
 
     private void setupAccountActionView(String accountActionText, String actionButtonText) {
-        TextView accountActionView = (TextView) findViewById(R.id.account_action);
-        accountActionView.setText(accountActionText);
-        Button accountActionButton = (Button) findViewById(R.id.action_button);
-        accountActionButton.setText(actionButtonText);
+        mAccountActionView.setText(accountActionText);
+        mAccountActionButton.setText(actionButtonText);
     }
 
     public void onActionButtonClick(View view) {
         HashMap<String, String> user = getUserFromInput();
-        mUserRequest = new LeafletUserRegistrationRequest(this);
         if (user != null) {
-            switch (mAccountAction) {
-                case CREATE:
-                    mUserRequest.registerAccount(user.get(KEY_USERNAME), user.get(KEY_PASSWORD));
-                    break;
-                case UPDATE:
-                    if (mUserRequest.isAccountRegistered()) {
-                        mUserRequest.updateAccount(user.get(KEY_USERNAME), user.get(KEY_PASSWORD));
-                    } else {
-                        Toast.makeText(this, R.string.login_warning, Toast.LENGTH_SHORT).show();
-                    }
-                    break;
-                case VERIFY:
-                    mUserRequest.verifyAccount(user.get(KEY_USERNAME), user.get(KEY_PASSWORD));
-                    break;
-                default:
-                    break;
-            }
-            new AccountActionTask().execute();
+            new AccountActionTask().execute(user);
         } else {
             Toast.makeText(this, R.string.fill_fields_warning, Toast.LENGTH_SHORT).show();
         }
     }
 
     private HashMap<String, String> getUserFromInput() {
-        EditText usernameEditText = (EditText) findViewById(R.id.username_input);
-        EditText passwordEditText = (EditText) findViewById(R.id.password_input);
-        Editable username = usernameEditText.getText();
-        Editable password = passwordEditText.getText();
-        HashMap<String, String> user = null;
+        Editable username = ((EditText) findViewById(R.id.username_input)).getText();
+        Editable password = ((EditText) findViewById(R.id.password_input)).getText();
 
+        HashMap<String, String> user = null;
         if (username != null && password != null) {
             if (!username.toString().trim().isEmpty() && !password.toString().trim().isEmpty()) {
                 user = new HashMap<String, String>();
@@ -134,64 +123,6 @@ public class AccountActionActivity extends ActionBarActivity {
         return user;
     }
 
-    private void displayAccountActionResult() {
-        ImageView accountStatusCheckmark = (ImageView) findViewById(R.id.account_status_checkmark);
-        TextView accountStatusView = (TextView) findViewById(R.id.account_status);
-
-        accountStatusCheckmark.setVisibility(View.VISIBLE);
-        accountStatusView.setVisibility(View.VISIBLE);
-
-        accountStatusView.setText(mUserRequest.getResponseMessage());
-        accountStatusCheckmark.setImageDrawable(getResources().getDrawable(
-                mUserRequest.wasSuccessful() ? R.drawable.check_right : R.drawable.check_wrong));
-
-        if (mAccountAction == AccountAction.VERIFY
-                && mUserRequest.wasSuccessful()) {
-            syncUserCollection();
-        }
-    }
-
-    private void syncUserCollection() {
-        TextView collectionStatusView = (TextView) findViewById(R.id.collection_status);
-        collectionStatusView.setVisibility(View.VISIBLE);
-        collectionStatusView.setText(getResources().getText(R.string.collection_sync_progress));
-
-        deleteLocalCollection();
-        String username = getSessionManager().getCurrentUser().get(SessionManager.KEY_USERNAME);
-        mCollectionRequest = new LeafletUserCollectionRequest(this);
-        mCollectionRequest.updateUserCollectionSyncStatus(username);
-        new CollectionSyncTask().execute();
-    }
-
-    private void deleteLocalCollection() {
-        try {
-            TableUtils.clearTable(getDbHelper().getConnectionSource(), CollectedLeaf.class);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void displayCollectionSyncResult() {
-        ImageView collectionStatusCheckmark = (ImageView) findViewById(R.id.collection_status_checkmark);
-        TextView collectionStatusView = (TextView) findViewById(R.id.collection_status);
-
-        collectionStatusCheckmark.setVisibility(View.VISIBLE);
-        collectionStatusView.setVisibility(View.VISIBLE);
-
-        collectionStatusView.setText(getResources().getText(R.string.collection_sync_success));
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
     private SessionManager getSessionManager() {
         if (mSessionManager == null) {
             mSessionManager = new SessionManager(this);
@@ -199,33 +130,11 @@ public class AccountActionActivity extends ActionBarActivity {
         return mSessionManager;
     }
 
-    private DatabaseHelper getDbHelper() {
-        if (mDbHelper == null) {
-            mDbHelper = OpenHelperManager.getHelper(this, DatabaseHelper.class);
-        }
-        return mDbHelper;
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        if (mDbHelper != null) {
-            OpenHelperManager.releaseHelper();
-            mDbHelper = null;
-        }
-
-        if (mCollectionRequest != null) {
-            mCollectionRequest.close();
-            mCollectionRequest = null;
-        }
-    }
-
     public enum AccountAction {
         CREATE, UPDATE, VERIFY
     }
 
-    private class AccountActionTask extends AsyncTask<Void, Void, Void> {
+    private class AccountActionTask extends AsyncTask<HashMap<String, String>, Void, Boolean> {
 
         @Override
         protected void onPreExecute() {
@@ -233,22 +142,57 @@ public class AccountActionActivity extends ActionBarActivity {
         }
 
         @Override
-        protected Void doInBackground(Void... arg0) {
+        protected Boolean doInBackground(HashMap<String, String>... user) {
+            final LeafletUserRegistrationRequest mUserRequest =
+                    new LeafletUserRegistrationRequest(getBaseContext());
+            switch (mAccountAction) {
+                case CREATE:
+                    mUserRequest.registerAccount(user[0].get(KEY_USERNAME), user[0].get(KEY_PASSWORD));
+                    break;
+                case UPDATE:
+                    if (mUserRequest.isAccountRegistered()) {
+                        mUserRequest.updateAccount(user[0].get(KEY_USERNAME), user[0].get(KEY_PASSWORD));
+                    } else {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getBaseContext(), R.string.login_warning, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                    break;
+                case VERIFY:
+                    mUserRequest.verifyAccount(user[0].get(KEY_USERNAME), user[0].get(KEY_PASSWORD));
+                    break;
+            }
+
             while (!mUserRequest.isFinished()) {
                 SystemClock.sleep(100);
             }
+
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    displayAccountActionResult();
+                    TextView accountStatus = (TextView) findViewById(R.id.account_status);
+                    accountStatus.setText(mUserRequest.getResponseMessage());
                 }
             });
-            return null;
+
+            return mUserRequest.wasSuccessful();
         }
 
         @Override
-        protected void onPostExecute(Void result) {
+        protected void onPostExecute(Boolean wasSuccessful) {
             setSupportProgressBarIndeterminateVisibility(false);
+
+            mAccountStatusView.setVisibility(View.VISIBLE);
+            mAccountStatusCheckMark.setVisibility(View.VISIBLE);
+
+            mAccountStatusCheckMark.setImageResource(wasSuccessful ? R.drawable.check_right : R.drawable.check_wrong);
+
+            if (mAccountAction == AccountAction.VERIFY && wasSuccessful) {
+                new CollectionSyncTask().execute();
+            }
         }
     }
 
@@ -257,25 +201,29 @@ public class AccountActionActivity extends ActionBarActivity {
         @Override
         protected void onPreExecute() {
             setSupportProgressBarIndeterminateVisibility(true);
+            mCollectionStatusView.setVisibility(View.VISIBLE);
+            mCollectionStatusView.setText(getResources().getText(R.string.collection_sync_progress));
         }
 
         @Override
-        protected Void doInBackground(Void... arg0) {
+        protected Void doInBackground(Void... params) {
+            LeafletUserCollectionRequest mCollectionRequest =
+                    new LeafletUserCollectionRequest(getBaseContext());
+            mCollectionRequest.updateUserCollectionSyncStatus();
             while (!mCollectionRequest.isFinished()) {
                 SystemClock.sleep(100);
             }
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    displayCollectionSyncResult();
-                }
-            });
+            mCollectionRequest.close();
             return null;
         }
 
         @Override
         protected void onPostExecute(Void result) {
             setSupportProgressBarIndeterminateVisibility(false);
+
+            mCollectionStatusView.setVisibility(View.VISIBLE);
+            mCollectionStatusCheckMark.setVisibility(View.VISIBLE);
+            mCollectionStatusView.setText(getResources().getText(R.string.collection_sync_success));
         }
     }
 }

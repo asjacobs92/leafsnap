@@ -10,16 +10,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.FrameLayout;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.nio.ByteBuffer;
 
 import edu.maryland.leafsnap.R;
 import edu.maryland.leafsnap.util.CameraPreview;
@@ -31,7 +26,7 @@ public class CameraActivity extends Activity {
     private Camera.PictureCallback mPicture = new Camera.PictureCallback() {
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
-            File pictureFile = MediaUtils.getOutputMediaFile();
+            File pictureFile = MediaUtils.getPublicDirectoryOutputMediaFile();
             if (pictureFile == null) {
                 Log.d(TAG, "Error creating media file, check storage permissions.");
                 return;
@@ -54,7 +49,7 @@ public class CameraActivity extends Activity {
             }
 
             Intent i = new Intent(getBaseContext(), UploadImageActivty.class);
-            i.putExtra(UploadImageActivty.ARG_IMAGE, Uri.fromFile(pictureFile));
+            i.putExtra(UploadImageActivty.ARG_IMAGE_URI, Uri.fromFile(pictureFile));
             startActivity(i);
             finish();
         }
@@ -98,7 +93,7 @@ public class CameraActivity extends Activity {
         if (requestCode == IMAGE_PICKER_SELECT && resultCode != 0) {
             Uri bitmapUri = data.getData();
             Intent i = new Intent(getBaseContext(), UploadImageActivty.class);
-            i.putExtra(UploadImageActivty.ARG_IMAGE, bitmapUri);
+            i.putExtra(UploadImageActivty.ARG_IMAGE_URI, bitmapUri);
             startActivity(i);
         }
         finish();

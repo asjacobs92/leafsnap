@@ -47,7 +47,7 @@ public class CollectedLeaf implements Serializable {
     private LeafletUrl segmentedImageURL;
 
     public CollectedLeaf() {
-
+        leafID = -1;
     }
 
     public SyncStatus getSyncStatus() {
@@ -156,10 +156,6 @@ public class CollectedLeaf implements Serializable {
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public enum SyncStatus {

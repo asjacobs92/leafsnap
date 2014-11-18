@@ -20,17 +20,7 @@ public class TabUtils {
             R.string.title_collection_tab,
             R.string.title_options_tab};
 
-    private static final int[] tabsIconsIds = {
-            R.drawable.home_tab,
-            R.drawable.browse_tab,
-            R.drawable.collection_tab,
-            R.drawable.options_tab};
-
     public static int getTabTitleId(int position) {
         return tabsTitlesIds[position];
-    }
-
-    public static int getTabIconId(int position) {
-        return tabsIconsIds[position];
     }
 }

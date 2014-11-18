@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name" translatable="false">Leafsnap</string>
     <string name="title_home_tab" translatable="false">Home</string>
     <string name="title_browse_tab" translatable="false">Browse</string>
@@ -59,7 +58,6 @@
     <string name="unlabeled_species">Unlabeled species</string>
     <string name="collected">Collected </string>
     <string name="title_activity_camera">CameraActivity</string>
-    <string name="title_activity_camera_activity2">CameraActivity2</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="white_bg_instr">Place leaf on a white background.</string>
@@ -67,5 +65,14 @@
     <string name="gallery">Gallery</string>
     <string name="cancel">Cancel</string>
     <string name="title_activity_upload_image_activty">UploadImageActivty</string>
+    <string name="uploading_image">Uploading image.</string>
+    <string name="action">Action</string>
+    <string name="delete">Delete</string>
+    <string name="label">Label</string>
+    <string name="confirm_delete">Are you sure you want to delete?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="deletion_error">"Deletion failed, most likely to the lack of connectivity."</string>
+    <string name="labeling_error">"Labeling failed, most likely to the lack of connectivity."</string>
 
 </resources>

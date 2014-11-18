@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
 import android.net.Uri;
@@ -20,6 +21,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * TODO: Comment this.
@@ -30,6 +33,8 @@ public class MediaUtils {
     private static final String TAG = "MEDIA_UTILS";
 
     private static final long MINIMUM_FREE_SPACE_BYTES = 104857600;
+
+    private static final String IMAGE_PATTERN = "([^\\s]+(\\.(?i)(jpg|png|gif|bmp))$)";
 
     public static void setCameraDisplayOrientation(Activity activity, int cameraId, Camera camera) {
         Camera.CameraInfo info =
@@ -90,10 +95,29 @@ public class MediaUtils {
         return d;
     }
 
-    public static void saveImageToExternalStorage(Context c, Bitmap image, String imagePath) {
+    public static String getRealPathFromURI(Context c, Uri contentUri) {
+        Pattern pattern = Pattern.compile(IMAGE_PATTERN);
+        Matcher matcher = pattern.matcher(contentUri.getLastPathSegment());
+        if (matcher.matches()) {
+            return contentUri.getPath();
+        }
+        // can post image
+        String [] proj = { MediaStore.Images.Media.DATA };
+        Cursor cursor = c.getContentResolver().query(contentUri,
+                proj, // Which columns to return
+                null,       // WHERE clause; which rows to return (all rows)
+                null,       // WHERE clause selection arguments (none)
+                null); // Order-by clause (ascending by name)
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+
+        return cursor.getString(column_index);
+    }
+
+    public static void saveBitmapToExternalStorage(Context c, Bitmap bitmap, String bitmapPath) {
         if (MediaUtils.isExternalStorageWritable()) {
             File imageFile = new File(c.getExternalFilesDir(
-                    Environment.DIRECTORY_PICTURES), imagePath);
+                    Environment.DIRECTORY_PICTURES), bitmapPath);
             if (!imageFile.getParentFile().exists()) {
                 if (!imageFile.getParentFile().mkdirs()) {
                     Log.e(TAG, "Could not create species directory.");
@@ -105,7 +129,7 @@ public class MediaUtils {
                 try {
                     if (imageFile.createNewFile()) {
                         fileOutputStream = new FileOutputStream(imageFile);
-                        image.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
 
                         fileOutputStream.flush();
                         fileOutputStream.close();
@@ -117,7 +141,7 @@ public class MediaUtils {
         }
     }
 
-    public static File getOutputMediaFile() {
+    public static File getPublicDirectoryOutputMediaFile() {
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES), "Leafsnap");
 

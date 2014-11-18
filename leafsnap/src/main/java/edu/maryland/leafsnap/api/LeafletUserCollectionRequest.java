@@ -3,6 +3,7 @@ package edu.maryland.leafsnap.api;
 import android.content.Context;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
+import com.j256.ormlite.table.TableUtils;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
@@ -19,6 +20,7 @@ import edu.maryland.leafsnap.data.DatabaseHelper;
 import edu.maryland.leafsnap.model.CollectedLeaf;
 import edu.maryland.leafsnap.model.LeafletUrl;
 import edu.maryland.leafsnap.model.Species;
+import edu.maryland.leafsnap.util.SessionManager;
 
 
 /**
@@ -31,25 +33,26 @@ public class LeafletUserCollectionRequest {
     private Context mContext;
     private boolean mFinished;
     private DatabaseHelper mDbHelper;
+    private SessionManager mSessionManager;
 
     public LeafletUserCollectionRequest(Context context) {
         setFinished(false);
         mContext = context;
     }
 
-    public void updateUserCollectionSyncStatus(String username) {
+    public void updateUserCollectionSyncStatus() {
+        deleteLocalCollection();
         RequestParams params = new RequestParams();
+        String username = getSessionManager().getCurrentUser().get(SessionManager.KEY_USERNAME);
         params.put("fmt", "json");
-        LeafletAsyncRestClient.get("/users/" + username + "/", params, new JsonHttpResponseHandler() {
+        LeafletRestClient.get("/users/" + username + "/", params, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
                 try {
                     parseResult(response);
                     setFinished(true);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                } catch (SQLException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -60,7 +63,15 @@ public class LeafletUserCollectionRequest {
                 setFinished(true);
                 throwable.printStackTrace();
             }
-        });
+        }, false);
+    }
+
+    private void deleteLocalCollection() {
+        try {
+            TableUtils.clearTable(getDbHelper().getConnectionSource(), CollectedLeaf.class);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void parseResult(JSONObject result) throws JSONException, SQLException {
@@ -71,8 +82,8 @@ public class LeafletUserCollectionRequest {
 
             collectedLeaf.setSyncStatus(CollectedLeaf.SyncStatus.SAME);
             collectedLeaf.setLeafID(oneImage.getLong("id"));
-            collectedLeaf.setCollectedDate(new Date(oneImage.getLong("phototime")));
-            collectedLeaf.setLastModified(new Date(oneImage.getLong("lastmodified")));
+            collectedLeaf.setCollectedDate(new Date(oneImage.getLong("phototime") * 1000));
+            collectedLeaf.setLastModified(new Date(oneImage.getLong("lastmodified") * 1000));
 
             collectedLeaf = parseCollectedLeafAltitude(collectedLeaf, oneImage);
             collectedLeaf = parseCollectedLeafLatitude(collectedLeaf, oneImage);
@@ -85,7 +96,7 @@ public class LeafletUserCollectionRequest {
             getDbHelper().getCollectedLeafDao().create(collectedLeaf);
 
             LeafletRecognitionRequest recognitionRequest =
-                    new LeafletRecognitionRequest(mContext, collectedLeaf, false);
+                    new LeafletRecognitionRequest(mContext, collectedLeaf);
             recognitionRequest.loadRecognitionResult();
         }
     }
@@ -168,6 +179,13 @@ public class LeafletUserCollectionRequest {
             mDbHelper = OpenHelperManager.getHelper(mContext, DatabaseHelper.class);
         }
         return mDbHelper;
+    }
+
+    private SessionManager getSessionManager() {
+        if (mSessionManager == null) {
+            mSessionManager = new SessionManager(mContext);
+        }
+        return mSessionManager;
     }
 
     public void close() {

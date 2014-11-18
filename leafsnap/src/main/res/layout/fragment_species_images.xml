@@ -2,11 +2,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="edu.maryland.leafsnap.activity.SpeciesAcitivity">
+    tools:context="edu.maryland.leafsnap.activity.SpeciesActivity">
 
     <uk.co.senab.photoview.PhotoView
         android:id="@+id/image_display"
-        android:src="@drawable/sakura"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"

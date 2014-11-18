@@ -37,17 +37,10 @@ public class OptionsAccountActivity extends ActionBarActivity {
             username.setText(getResources().getText(R.string.not_logged_in));
         }
     }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
+    /*
+        Creation is buggy on the server side, so it was cut out.
+        The user is automatically created when the user uses Snap It!
+     */
     /*public void onNewAccountButtonClick(View view) {
         Intent intent = new Intent(this, AccountActionActivity.class);
         intent.putExtra(AccountActionActivity.ACTION_ARG, AccountActionActivity.AccountAction.CREATE);

@@ -3,6 +3,7 @@ package edu.maryland.leafsnap.fragment;
 import android.app.Fragment;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -20,13 +21,11 @@ import android.widget.TextView;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.ArrayList;
 
 import edu.maryland.leafsnap.R;
-import edu.maryland.leafsnap.activity.SpeciesAcitivity;
+import edu.maryland.leafsnap.activity.SpeciesActivity;
 import edu.maryland.leafsnap.data.DatabaseHelper;
 import edu.maryland.leafsnap.model.LeafletUrl;
 import edu.maryland.leafsnap.model.Species;
@@ -37,8 +36,9 @@ public class SpeciesImagesFragment extends Fragment {
 
     private boolean mFullscreen = false;
 
+    private LinearLayout mImagePicker;
+
     private Species mSpecies;
-    private DatabaseHelper mDbHelper;
     private PhotoViewAttacher mAttacher;
 
     @Override
@@ -46,7 +46,7 @@ public class SpeciesImagesFragment extends Fragment {
                              Bundle savedInstanceState) {
         Bundle b = this.getArguments();
         if (b != null) {
-            mSpecies = (Species) b.getSerializable(SpeciesAcitivity.ARG_SPECIES);
+            mSpecies = (Species) b.getSerializable(SpeciesActivity.ARG_SPECIES);
         }
         return inflater.inflate(R.layout.fragment_species_images, container, false);
     }
@@ -54,24 +54,15 @@ public class SpeciesImagesFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        initImagePicker();
-        initImageDisplay();
+        mImagePicker = (LinearLayout) getActivity().findViewById(R.id.image_picker);
+        new PopulateImagePickerTask().execute();
+
     }
 
     @Override
     public void onResume() {
         super.onResume();
         setImageDisplayFirstLeaflet();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        if (mDbHelper != null) {
-            OpenHelperManager.releaseHelper();
-            mDbHelper = null;
-        }
     }
 
     private void setImageDisplayFirstLeaflet() {
@@ -116,27 +107,10 @@ public class SpeciesImagesFragment extends Fragment {
         FrameLayout optionsBar = (FrameLayout) getActivity().findViewById(R.id.images_options_bar);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             optionsBar.animate()
-                    .translationY(fullscreen ? optionsBar.getHeight() : 0)
-                    .setDuration(getResources().getInteger(android.R.integer.config_shortAnimTime));
+                .translationY(fullscreen ? optionsBar.getHeight() : 0)
+                .setDuration(getResources().getInteger(android.R.integer.config_shortAnimTime));
         } else {
             optionsBar.setVisibility(fullscreen ? View.GONE : View.VISIBLE);
-        }
-    }
-
-    private void initImagePicker() {
-        LinearLayout imagePicker = (LinearLayout) getActivity().findViewById(R.id.image_picker);
-        try {
-            List<LeafletUrl> leafletUrls = getDbHelper().getLeafletUrlDao().queryForEq("associatedSpecies_id",
-                    mSpecies.getId());
-            for (LeafletUrl leafletUrl : leafletUrls) {
-                Drawable d = MediaUtils.getDrawableFromAssets(getActivity(),
-                        leafletUrl.getRawURL().replace("/species", "species"));
-                if (d != null) {
-                    imagePicker.addView(getSmallImageLayout(leafletUrl, d));
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
     }
 
@@ -182,10 +156,49 @@ public class SpeciesImagesFragment extends Fragment {
         return leafletType;
     }
 
-    private DatabaseHelper getDbHelper() {
-        if (mDbHelper == null) {
-            mDbHelper = OpenHelperManager.getHelper(getActivity(), DatabaseHelper.class);
+    private class PopulateImagePickerTask extends AsyncTask<Void, Void, ArrayList<LeafletUrl>> {
+
+        private DatabaseHelper mDbHelper;
+
+        @Override
+        protected ArrayList<LeafletUrl> doInBackground(Void... params) {
+            ArrayList<LeafletUrl> leafletUrls = null;
+            try {
+                leafletUrls = (ArrayList<LeafletUrl>)
+                        getDbHelper().getLeafletUrlDao().queryForEq("associatedSpecies_id",
+                                mSpecies.getId());
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return leafletUrls;
         }
-        return mDbHelper;
+
+        @Override
+        protected void onPostExecute(ArrayList<LeafletUrl> result) {
+            if (!result.isEmpty()) {
+                for (LeafletUrl leafletUrl : result) {
+                    Drawable d = MediaUtils.getDrawableFromAssets(getActivity(),
+                            leafletUrl.getRawURL().replace("/species", "species"));
+                    if (d != null) {
+                        mImagePicker.addView(getSmallImageLayout(leafletUrl, d));
+                    }
+                }
+                initImageDisplay();
+            }
+
+            if (mDbHelper != null) {
+                OpenHelperManager.releaseHelper();
+                mDbHelper = null;
+            }
+        }
+
+        private DatabaseHelper getDbHelper() {
+            if (mDbHelper == null) {
+                mDbHelper = OpenHelperManager.getHelper(getActivity(), DatabaseHelper.class);
+            }
+            return mDbHelper;
+        }
     }
+
+
 }

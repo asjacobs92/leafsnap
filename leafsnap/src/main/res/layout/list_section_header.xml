@@ -7,7 +7,7 @@
         android:id="@+id/section_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="start|left"
+        android:layout_gravity="start"
         android:alpha="0.4"
         android:background="@color/list_header_grey"
         android:padding="5dp"

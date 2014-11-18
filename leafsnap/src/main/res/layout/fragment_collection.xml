@@ -10,17 +10,43 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/collection_list_header"
-            android:layout_width="match_parent"
+        <RelativeLayout
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="start|top"
-            android:alpha="0.4"
+            android:layout_gravity="start"
+            android:alpha="0.8"
             android:background="@color/list_header_grey"
             android:padding="5dp"
-            android:textColor="@color/white"
-            android:textSize="17sp"
-            android:textStyle="bold" />
+            android:id="@+id/relativeLayout">
+
+            <TextView
+                android:text="User's collection"
+                android:id="@+id/collection_list_header"
+                android:layout_height="wrap_content"
+                android:layout_width="fill_parent"
+                android:layout_gravity="start"
+                android:textColor="@color/white"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:layout_toLeftOf="@+id/edit_button"
+                android:layout_toStartOf="@+id/edit_button" />
+
+            <Button
+                android:id="@+id/edit_button"
+                android:text="Edit"
+                android:background="@drawable/header_button_shape"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:minHeight="20dp"
+                android:minWidth="50dp"
+                android:gravity="center"
+                android:layout_marginEnd="2dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
+
+        </RelativeLayout>
 
         <ListView
             android:id="@+id/collection_list"
@@ -29,12 +55,11 @@
             android:layout_height="match_parent"
             android:drawSelectorOnTop="true"
             android:fastScrollEnabled="true"
-            android:dividerHeight="1px"
-            android:divider="@drawable/listview_divider"
             android:listSelector="@drawable/listview_selector"
-            android:layout_below="@+id/collection_list_header"
+            android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/relativeLayout" />
 
     </RelativeLayout>
 

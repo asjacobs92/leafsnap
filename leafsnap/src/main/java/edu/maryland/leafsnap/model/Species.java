@@ -168,7 +168,10 @@ public class Species implements Serializable, Comparable<Species> {
      */
     @Override
     public int compareTo(Species another) {
-        return this.getCommomName().compareTo(another.getCommomName());
+        if (another != null) {
+            return this.getCommomName().compareTo(another.getCommomName());
+        }
+        return -1;
     }
 
     public ForeignCollection<RankedSpecies> getAssociatedRankedSpecies() {

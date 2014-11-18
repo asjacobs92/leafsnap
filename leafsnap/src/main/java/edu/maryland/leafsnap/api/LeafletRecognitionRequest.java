@@ -30,45 +30,25 @@ public class LeafletRecognitionRequest {
     private static final String LOG_TAG = "RECOGNITION_REQUEST";
 
     private Context mContext;
-    private boolean mSynchronous;
     private DatabaseHelper mDbHelper;
     private CollectedLeaf mCollectedLeaf;
 
     public LeafletRecognitionRequest(Context context, CollectedLeaf collectedLeaf) {
         mContext = context;
-        mSynchronous = false;
-        mCollectedLeaf = collectedLeaf;
-    }
-
-    public LeafletRecognitionRequest(Context context, CollectedLeaf collectedLeaf, boolean synchronous) {
-        mContext = context;
-        mSynchronous = synchronous;
         mCollectedLeaf = collectedLeaf;
     }
 
     public void loadRecognitionResult() {
-        JsonHttpResponseHandler handler = getJsonHttpResponseHandler();
-
         RequestParams params = new RequestParams();
         params.put("fmt", "json");
-        if (mSynchronous) {
-            LeafletSyncRestClient.get("/" + mCollectedLeaf.getLeafID() + "/results/", params, handler);
-        } else {
-            LeafletAsyncRestClient.get("/" + mCollectedLeaf.getLeafID() + "/results/", params, handler);
-        }
-    }
-
-    private JsonHttpResponseHandler getJsonHttpResponseHandler() {
-        return new JsonHttpResponseHandler() {
+        LeafletRestClient.get("/" + mCollectedLeaf.getLeafID() + "/results/", params, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
                 try {
                     parseResult(response);
                     mCollectedLeaf.setUploaded(true);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                } catch (SQLException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -77,7 +57,7 @@ public class LeafletRecognitionRequest {
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable error) {
                 Log.e(LOG_TAG, "Recognition request failed. Error: " + error.getMessage());
             }
-        };
+        }, false);
     }
 
     private void parseResult(JSONObject result) throws JSONException, SQLException {
@@ -89,7 +69,7 @@ public class LeafletRecognitionRequest {
                 ArrayList<Species> queryResults = (ArrayList<Species>) getDbHelper().
                         getSpeciesDao().queryForEq("scientificName", oneMatch.get("sciname"));
                 if (!queryResults.isEmpty()) {
-                    RankedSpecies rankedSpecies = new RankedSpecies(i, queryResults.get(0));
+                    RankedSpecies rankedSpecies = new RankedSpecies(i+1, queryResults.get(0));
                     rankedSpecies.setAssociatedCollection(mCollectedLeaf);
                     getDbHelper().getRankedSpeciesDao().create(rankedSpecies);
                 }

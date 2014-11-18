@@ -21,24 +21,25 @@ public class LeafletImageManager {
     private DatabaseHelper mDbHelper;
 
     public LeafletImageManager(Context context) {
-        setContext(context);
+        mContext = context;
     }
 
     public void consolidateDatabase() {
-        new ProgressTask().execute();
-    }
-
-    private Context getContext() {
-        return mContext;
-    }
-
-    private void setContext(Context mContext) {
-        this.mContext = mContext;
+        ArrayList<LeafletUrl> leafletUrls;
+        try {
+            leafletUrls = (ArrayList<LeafletUrl>) getDbHelper().getLeafletUrlDao().queryForAll();
+            for (LeafletUrl leafletUrl : leafletUrls) {
+                LeafletImageLoader imageLoader = new LeafletImageLoader(mContext, leafletUrl);
+                imageLoader.loadImage();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private DatabaseHelper getDbHelper() {
         if (mDbHelper == null) {
-            mDbHelper = OpenHelperManager.getHelper(getContext(), DatabaseHelper.class);
+            mDbHelper = OpenHelperManager.getHelper(mContext, DatabaseHelper.class);
         }
         return mDbHelper;
     }
@@ -49,22 +50,4 @@ public class LeafletImageManager {
             mDbHelper = null;
         }
     }
-
-    private class ProgressTask extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... arg0) {
-            ArrayList<LeafletUrl> leafletUrls;
-            try {
-                leafletUrls = (ArrayList<LeafletUrl>) getDbHelper().getLeafletUrlDao().queryForAll();
-                for (LeafletUrl leafletUrl : leafletUrls) {
-                    LeafletImageLoader imageLoader = new LeafletImageLoader(getContext(), leafletUrl, true);
-                    imageLoader.loadImage();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-    }
-
 }

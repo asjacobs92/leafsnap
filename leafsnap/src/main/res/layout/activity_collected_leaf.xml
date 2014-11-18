@@ -8,7 +8,7 @@
     <RelativeLayout
         android:id="@+id/results_images_view"
         android:orientation="horizontal"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true">
@@ -16,29 +16,25 @@
         <ImageView
             android:id="@+id/collected_leaf_display"
             android:src="@drawable/sakura"
-            android:padding="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginRight="10dp"
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:adjustViewBounds="true"
             android:scaleType="fitCenter"
             android:contentDescription="@string/species_description"
-            android:layout_alignParentTop="true" />
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
 
         <ImageView
             android:id="@+id/segmented_leaf_display"
             android:src="@drawable/sakura"
-            android:padding="10dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginLeft="10dp"
+            android:alpha="0.4"
             android:scaleType="fitCenter"
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:adjustViewBounds="true"
             android:contentDescription="@string/species_description"
             android:layout_alignParentTop="true"
-            android:layout_toEndOf="@+id/collected_leaf_display"/>
+            android:layout_centerHorizontal="true" />
 
     </RelativeLayout>
 
@@ -48,18 +44,43 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/results_list_header"
-            android:text="@string/snap_results"
-            android:layout_width="match_parent"
+        <RelativeLayout
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="start|top"
-            android:alpha="0.4"
+            android:layout_gravity="start"
+            android:alpha="0.8"
             android:background="@color/list_header_grey"
             android:padding="5dp"
-            android:textColor="@color/white"
-            android:textSize="17sp"
-            android:textStyle="bold" />
+            android:id="@+id/relativeLayout">
+
+            <TextView
+                android:id="@+id/results_list_header"
+                android:text="@string/snap_results"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start|top"
+                android:textColor="@color/white"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:layout_toLeftOf="@+id/label_button"
+                android:layout_toStartOf="@+id/label_button" />
+
+            <Button
+                android:id="@+id/label_button"
+                android:text="@string/label"
+                android:background="@drawable/header_button_shape"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:minHeight="20dp"
+                android:minWidth="60dp"
+                android:gravity="center"
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
+
+        </RelativeLayout>
 
         <ListView
             android:id="@+id/results_list"
@@ -70,7 +91,7 @@
             android:dividerHeight="1px"
             android:divider="@drawable/listview_divider"
             android:listSelector="@drawable/listview_selector"
-            android:layout_below="@+id/results_list_header"
+            android:layout_below="@+id/relativeLayout"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
 

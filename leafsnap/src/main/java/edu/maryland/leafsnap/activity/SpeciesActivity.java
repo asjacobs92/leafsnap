@@ -10,7 +10,7 @@ import edu.maryland.leafsnap.fragment.SpeciesDetailsFragment;
 import edu.maryland.leafsnap.fragment.SpeciesImagesFragment;
 import edu.maryland.leafsnap.model.Species;
 
-public class SpeciesAcitivity extends ActionBarActivity {
+public class SpeciesActivity extends ActionBarActivity {
 
     public static final String ARG_SPECIES = "species";
 
@@ -37,13 +37,13 @@ public class SpeciesAcitivity extends ActionBarActivity {
         }
 
         if (savedInstanceState == null) {
-            SpeciesImagesFragment fragment = new SpeciesImagesFragment();
+            SpeciesImagesFragment frontFragment = new SpeciesImagesFragment();
             Bundle args = new Bundle();
-            args.putSerializable(SpeciesAcitivity.ARG_SPECIES, mSpecies);
-            fragment.setArguments(args);
+            args.putSerializable(SpeciesActivity.ARG_SPECIES, mSpecies);
+            frontFragment.setArguments(args);
             getFragmentManager()
                     .beginTransaction()
-                    .add(R.id.card_flip_container, fragment)
+                    .add(R.id.card_flip_container, frontFragment)
                     .commit();
         }
     }
@@ -75,16 +75,16 @@ public class SpeciesAcitivity extends ActionBarActivity {
             mShowingBack = false;
         } else {
             mShowingBack = true;
-            SpeciesDetailsFragment fragment = new SpeciesDetailsFragment();
+            SpeciesDetailsFragment backFragment = new SpeciesDetailsFragment();
             Bundle args = new Bundle();
-            args.putSerializable(SpeciesAcitivity.ARG_SPECIES, mSpecies);
-            fragment.setArguments(args);
+            args.putSerializable(SpeciesActivity.ARG_SPECIES, mSpecies);
+            backFragment.setArguments(args);
             getFragmentManager()
                     .beginTransaction()
                     .setCustomAnimations(
                             R.anim.card_flip_right_in, R.anim.card_flip_right_out,
                             R.anim.card_flip_right_in, R.anim.card_flip_right_out)
-                    .replace(R.id.card_flip_container, fragment)
+                    .replace(R.id.card_flip_container, backFragment)
                     .addToBackStack(null)
                     .commit();
         }

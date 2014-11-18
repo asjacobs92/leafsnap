@@ -3,19 +3,26 @@
  */
 package edu.maryland.leafsnap.api;
 
+import android.os.Looper;
+import android.util.Log;
+
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+import com.loopj.android.http.SyncHttpClient;
+
+import org.apache.http.client.params.ClientPNames;
 
 /**
  * @author Arthur Jacobs
  */
-public class LeafletAsyncRestClient {
+public class LeafletRestClient {
     private static final String BASE_URL = "http://api.leafsnap.com/v1";
 
     private static AsyncHttpClient client;
 
-    public static void get(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
+    public static void get(String url, RequestParams params, AsyncHttpResponseHandler responseHandler, boolean encodeURL) {
+        getClient().setURLEncodingEnabled(encodeURL);
         getClient().get(getAbsoluteUrl(url), params, responseHandler);
     }
 
@@ -29,8 +36,14 @@ public class LeafletAsyncRestClient {
 
     public static AsyncHttpClient getClient() {
         if (client == null) {
-            client = new AsyncHttpClient();
+            if (Looper.myLooper() == null) {
+                client = new SyncHttpClient();
+            }
+            else {
+                client = new AsyncHttpClient();
+            }
         }
+        client.getHttpClient().getParams().setParameter(ClientPNames.ALLOW_CIRCULAR_REDIRECTS, true);
         return client;
     }
 }

@@ -2,6 +2,7 @@ package edu.maryland.leafsnap.fragment;
 
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 import edu.maryland.leafsnap.R;
@@ -30,7 +32,7 @@ public class HomeFragment extends Fragment {
     private static final int ANIMATION_LENGTH_MILLI = 6000;
     private static final int ANIMATION_FADE_LENGTH_MILLI = 3000;
 
-    private DatabaseHelper mDbHelper;
+    private ImageView mRandThumbnail;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -40,92 +42,87 @@ public class HomeFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        /*ImageView randThumbnail = (ImageView) getActivity().findViewById(R.id.rand_thumb);
+        mRandThumbnail = (ImageView) getActivity().findViewById(R.id.rand_thumb);
 
-        AnimationDrawable animation = initRandomImageAnimation();
-        animation.start();
-        randThumbnail.setImageDrawable(animation);
-        randThumbnail.post(animation);
-        randThumbnail.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-                TextView randThumbnailText = (TextView) getActivity().findViewById(R.id.rand_thumb_text);
-                int visibility = isThumbnailTextVisible(randThumbnailText) ? View.INVISIBLE : View.VISIBLE;
-                randThumbnailText.setVisibility(visibility);
-            }
-        });*/
+        new PopulateAnimationTask().execute();
     }
 
-    private AnimationDrawable initRandomImageAnimation() {
-        ArrayList<Species> speciesList = getSpeciesList();
-        ArrayList<Drawable> imagesList = getImageList(speciesList);
+    private class PopulateAnimationTask extends AsyncTask<Void, Void, AnimationDrawable> {
 
-        AnimationDrawable animation = new AnimationDrawable();
+        private DatabaseHelper mDbHelper;
 
-        for (Drawable image : imagesList) {
-            animation.addFrame(image, ANIMATION_LENGTH_MILLI);
+        @Override
+        protected AnimationDrawable doInBackground(Void... params) {
+            ArrayList<Species> speciesList = null;
+            try {
+                speciesList = (ArrayList<Species>) getDbHelper().getSpeciesDao().
+                        queryBuilder().orderByRaw("RANDOM()").limit(10L).query();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            if (speciesList != null && !speciesList.isEmpty()) {
+                AnimationDrawable animation = new AnimationDrawable();
+                ArrayList<Drawable> imagesList = getImageList(speciesList);
+
+                for (Drawable image : imagesList) {
+                    animation.addFrame(image, ANIMATION_LENGTH_MILLI);
+                }
+
+                animation.setOneShot(false);
+                animation.setEnterFadeDuration(ANIMATION_FADE_LENGTH_MILLI);
+                animation.setExitFadeDuration(ANIMATION_FADE_LENGTH_MILLI);
+
+                return animation;
+            }
+
+            return null;
         }
 
-        animation.setOneShot(false);
-        animation.setEnterFadeDuration(ANIMATION_FADE_LENGTH_MILLI);
-        animation.setExitFadeDuration(ANIMATION_FADE_LENGTH_MILLI);
+        @Override
+        protected void onPostExecute(AnimationDrawable result) {
+            if (result != null) {
+                result.start();
+                mRandThumbnail.setImageDrawable(result);
+                mRandThumbnail.post(result);
+            }
 
-        return animation;
-    }
+            if (mDbHelper != null) {
+                OpenHelperManager.releaseHelper();
+                mDbHelper = null;
+            }
+        }
 
-    private ArrayList<Drawable> getImageList(ArrayList<Species> speciesList) {
-        ArrayList<Drawable> imagesList = new ArrayList<Drawable>();
+        private ArrayList<Drawable> getImageList(ArrayList<Species> speciesList) {
+            ArrayList<Drawable> imagesList = new ArrayList<Drawable>();
 
-        for (Species oneSpecies : speciesList) {
-            ArrayList<String> exampleImageUrls = getExampleImageUrls(oneSpecies);
-            for (String url : exampleImageUrls) {
-                Drawable d = MediaUtils.getDrawableFromAssets(getActivity(), url);
-
-                if (d != null) {
-                    imagesList.add(d);
+            for (Species oneSpecies : speciesList) {
+                ArrayList<String> exampleImageUrls = getExampleImageUrls(oneSpecies);
+                for (String url : exampleImageUrls) {
+                    Drawable d = MediaUtils.getDrawableFromAssets(getActivity(), url);
+                    if (d != null) {
+                        imagesList.add(d);
+                    }
                 }
             }
+            return imagesList;
         }
-        return imagesList;
-    }
 
-    private ArrayList<String> getExampleImageUrls(Species oneSpecies) {
-        ArrayList<String> exampleImageUrls = new ArrayList<String>();
-        exampleImageUrls.add(oneSpecies.getExampleImageFlower().getRawURL().replace("/species", "species").split("\\?")[0]);
-        exampleImageUrls.add(oneSpecies.getExampleImageFruit().getRawURL().replace("/species", "species").split("\\?")[0]);
-        exampleImageUrls.add(oneSpecies.getExampleImageLeaf().getRawURL().replace("/species", "species").split("\\?")[0]);
-        return exampleImageUrls;
-    }
-
-    private ArrayList<Species> getSpeciesList() {
-        ArrayList<Species> speciesList = null;
-        try {
-            speciesList = (ArrayList<Species>) getDbHelper().getSpeciesDao().
-                    queryBuilder().orderByRaw("RANDOM()").limit(10L).query();
-        } catch (SQLException e) {
-            e.printStackTrace();
+        private ArrayList<String> getExampleImageUrls(Species oneSpecies) {
+            ArrayList<String> exampleImageUrls = new ArrayList<String>();
+            exampleImageUrls.add(oneSpecies.getExampleImageFlower().getRawURL().replace("/species", "species").split("\\?")[0]);
+            exampleImageUrls.add(oneSpecies.getExampleImageFruit().getRawURL().replace("/species", "species").split("\\?")[0]);
+            exampleImageUrls.add(oneSpecies.getExampleImageLeaf().getRawURL().replace("/species", "species").split("\\?")[0]);
+            return exampleImageUrls;
         }
-        return speciesList;
-    }
 
-    private boolean isThumbnailTextVisible(TextView randThumbnailText) {
-        return randThumbnailText.getVisibility() == View.VISIBLE;
-    }
-
-    private DatabaseHelper getDbHelper() {
-        if (mDbHelper == null) {
-            mDbHelper = OpenHelperManager.getHelper(getActivity(), DatabaseHelper.class);
-        }
-        return mDbHelper;
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        if (mDbHelper != null) {
-            OpenHelperManager.releaseHelper();
-            mDbHelper = null;
+        private DatabaseHelper getDbHelper() {
+            if (mDbHelper == null) {
+                mDbHelper = OpenHelperManager.getHelper(getActivity(), DatabaseHelper.class);
+            }
+            return mDbHelper;
         }
     }
+
+
 }
