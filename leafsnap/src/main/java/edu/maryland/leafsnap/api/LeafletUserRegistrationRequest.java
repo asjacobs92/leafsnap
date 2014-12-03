@@ -21,7 +21,8 @@ import edu.maryland.leafsnap.util.SessionManager;
  * Created by Arthur Jacobs on 03/07/2014.
  */
 public class LeafletUserRegistrationRequest {
-    private final static String ACCOUNT_DEFAULT_FAIL_MSG = "Account operation failed.";
+    private final static String ACCOUNT_DEFAULT_FAIL_MSG = "Account operation failed," +
+            " most likely due to lack of connectivity.";
     private final static String ACCOUNT_CREATE_SUCCESS = "Account successfully created.";
 
     private boolean mFinished;
@@ -32,7 +33,7 @@ public class LeafletUserRegistrationRequest {
     private SessionManager mSessionManager;
 
     public LeafletUserRegistrationRequest(Context context) {
-        this.setContext(context);
+        mContext = context;
     }
 
     public boolean isAccountRegistered() {
@@ -69,7 +70,7 @@ public class LeafletUserRegistrationRequest {
 
         params.put("user", username);
         params.put("passwd", password);
-        LeafletAsyncRestClient.post("/register/", params, new JsonHttpResponseHandler() {
+        LeafletRestClient.post("/register/", params, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
@@ -77,17 +78,18 @@ public class LeafletUserRegistrationRequest {
                 String responseMsg = "";
                 try {
                     successCode = response.getInt("success");
-                    responseMsg = response.getString("msg");
                     if (successCode == 1) {
                         responseMsg = ACCOUNT_CREATE_SUCCESS;
+                        String resultUsername = response.getString("user");
+                        String resultPassword = response.getString("passwd");
+
                         getSessionManager().logoutUser();
-                        getSessionManager().loginUser(username, password);
+                        getSessionManager().loginUser(resultUsername, resultPassword);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
-                setFinished(true);
                 setSuccessful((successCode == 1));
                 setResponseMessage(responseMsg);
                 Log.d("CREATE ACCOUNT", response.toString());
@@ -96,12 +98,12 @@ public class LeafletUserRegistrationRequest {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
-                setFinished(true);
                 setSuccessful(false);
                 setResponseMessage(ACCOUNT_DEFAULT_FAIL_MSG);
-                Log.d("CREATE ACCOUNT", errorResponse.toString());
+                Log.d("CREATE ACCOUNT", ACCOUNT_DEFAULT_FAIL_MSG);
             }
         });
+        setFinished(true);
     }
 
     public void updateAccount(final String newUsername, final String newPassword) {
@@ -111,10 +113,12 @@ public class LeafletUserRegistrationRequest {
         params.put("oldpasswd", getSessionManager().getCurrentUser().get(SessionManager.KEY_PASSWORD));
         params.put("user", newUsername);
         params.put("passwd", newPassword);
-        LeafletAsyncRestClient.post("/updatelogin/", params, new JsonHttpResponseHandler() {
+        Log.d("TAG", newUsername + " " + newPassword);
+        LeafletRestClient.post("/updatelogin/", params, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
+                Log.d("TAG", response.toString());
                 int successCode = 0;
                 String responseMsg = "";
                 try {
@@ -128,7 +132,6 @@ public class LeafletUserRegistrationRequest {
                     e.printStackTrace();
                 }
 
-                setFinished(true);
                 setSuccessful((successCode == 1));
                 setResponseMessage(responseMsg);
                 Log.d("UPDATE ACCOUNT", response.toString());
@@ -137,12 +140,12 @@ public class LeafletUserRegistrationRequest {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
-                setFinished(true);
                 setSuccessful(false);
                 setResponseMessage(ACCOUNT_DEFAULT_FAIL_MSG);
-                Log.d("UPDATE ACCOUNT", errorResponse.toString());
+                Log.d("UPDATE ACCOUNT", ACCOUNT_DEFAULT_FAIL_MSG);
             }
         });
+        setFinished(true);
     }
 
     public void verifyAccount(final String username, final String password) {
@@ -150,7 +153,7 @@ public class LeafletUserRegistrationRequest {
         params.put("fmt", "json");
         params.put("user", username);
         params.put("passwd", password);
-        LeafletAsyncRestClient.post("/login/", params, new JsonHttpResponseHandler() {
+        LeafletRestClient.post("/login/", params, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
@@ -167,7 +170,6 @@ public class LeafletUserRegistrationRequest {
                     e.printStackTrace();
                 }
 
-                setFinished(true);
                 setSuccessful((successCode == 1));
                 setResponseMessage(responseMsg);
                 Log.d("VERIFY ACCOUNT", response.toString());
@@ -176,12 +178,12 @@ public class LeafletUserRegistrationRequest {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
-                setFinished(true);
                 setSuccessful(false);
                 setResponseMessage(ACCOUNT_DEFAULT_FAIL_MSG);
-                Log.d("VERIFY ACCOUNT", errorResponse.toString());
+                Log.d("VERIFY ACCOUNT", ACCOUNT_DEFAULT_FAIL_MSG);
             }
         });
+        setFinished(true);
     }
 
     public boolean wasSuccessful() {
@@ -208,17 +210,9 @@ public class LeafletUserRegistrationRequest {
         this.mResponseMessage = responseMessage;
     }
 
-    public Context getContext() {
-        return mContext;
-    }
-
-    public void setContext(Context mContext) {
-        this.mContext = mContext;
-    }
-
     public SessionManager getSessionManager() {
         if (mSessionManager == null) {
-            mSessionManager = new SessionManager(getContext());
+            mSessionManager = new SessionManager(mContext);
         }
         return mSessionManager;
     }

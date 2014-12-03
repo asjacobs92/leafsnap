@@ -1,4 +1,6 @@
 .gradle
-/local.properties
+build
+local.properties
+leafsnap/build
 /.idea/workspace.xml
 .DS_Store

@@ -10,7 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import edu.maryland.leafsnap.R;
-import edu.maryland.leafsnap.activity.SpeciesAcitivity;
+import edu.maryland.leafsnap.activity.SpeciesActivity;
 import edu.maryland.leafsnap.model.Species;
 
 public class SpeciesDetailsFragment extends Fragment {
@@ -22,7 +22,7 @@ public class SpeciesDetailsFragment extends Fragment {
                              Bundle savedInstanceState) {
         Bundle b = this.getArguments();
         if (b != null) {
-            mSpecies = (Species) b.getSerializable(SpeciesAcitivity.ARG_SPECIES);
+            mSpecies = (Species) b.getSerializable(SpeciesActivity.ARG_SPECIES);
         }
         return inflater.inflate(edu.maryland.leafsnap.R.layout.fragment_species_details, container, false);
     }

@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="edu.maryland.leafsnap">
+    package="edu.maryland.leafsnap" >
 
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.screen.portrait" />
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true"/>
+
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -11,10 +19,16 @@
         android:allowBackup="true"
         android:icon="@drawable/leafy"
         android:label="@string/app_name"
-        android:logo="@drawable/leafy_no_background"
         android:theme="@style/Theme.Leafsnap" >
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyAMD5vmd5yOLTXLBXthfkPNf5NKLnQjGPE"/>
         <activity
             android:name=".activity.MainActivity"
+            android:screenOrientation="portrait"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,8 +37,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.SpeciesAcitivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:name=".activity.SpeciesActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Leafsnap" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -32,6 +46,7 @@
         </activity>
         <activity
             android:name=".activity.OptionsAccountActivity"
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_options_account" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -39,6 +54,7 @@
         </activity>
         <activity
             android:name=".activity.OptionsCameraActivity"
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_options_camera" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -46,6 +62,7 @@
         </activity>
         <activity
             android:name=".activity.OptionsDatabaseActivity"
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_options_database" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -53,10 +70,36 @@
         </activity>
         <activity
             android:name=".activity.AccountActionActivity"
-            android:label="@string/title_activity_options_account">
+            android:screenOrientation="portrait"
+            android:label="@string/title_activity_options_account" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="edu.maryland.leafsnap.activity.OptionsAccountActivity" />
+        </activity>
+        <activity
+            android:name=".activity.CollectedLeafActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/title_activity_collected_leaf" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="edu.maryland.leafsnap.activity.MainActivity" />
+        </activity>
+        <activity
+            android:name=".activity.CameraActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/title_activity_camera"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="edu.maryland.leafsnap.activity.MainActivity" />
+        </activity>
+        <activity
+            android:name=".activity.UploadImageActivty"
+            android:screenOrientation="portrait"
+            android:label="@string/title_activity_upload_image_activty" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="edu.maryland.leafsnap.activity.MainActivity" />
         </activity>
     </application>
 

@@ -17,9 +17,8 @@ import edu.maryland.leafsnap.util.TabUtils;
  */
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
+    private Fragment[] mFragments;
     private Context mContext;
-
-    private final Fragment[] mFragments;
 
     public SectionsPagerAdapter(Context context, FragmentManager fm, Fragment[] fragments) {
         super(fm);
@@ -29,7 +28,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        return getPageFragment(position++);
+        return getPageFragment(position);
     }
 
     @Override

@@ -9,10 +9,42 @@
     android:background="@color/black"
     tools:context="edu.maryland.leafsnap.activity.OptionsDatabaseActivity">
 
+
     <TextView
-        android:text="@string/todo"
+        android:text="Number of species: "
+        android:id="@+id/number_species_label"
         android:textColor="@color/white"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_marginEnd="29dp"
+        android:layout_marginTop="19dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="26dp" />
 
+    <TextView
+        android:text="123"
+        android:id="@+id/species_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_toEndOf="@+id/update_species_button"
+        android:layout_alignTop="@+id/number_species_label"
+        android:layout_toRightOf="@+id/update_species_button"
+        android:layout_marginEnd="10dp" />
+
+    <Button
+        android:id="@+id/update_species_button"
+        android:text="Update species list"
+        android:textColor="@color/white"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onUpdateSpeciesButtonClick"
+        android:drawableStart="@drawable/ic_action_refresh"
+        android:layout_marginTop="38dp"
+        android:layout_below="@+id/number_species_label"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>

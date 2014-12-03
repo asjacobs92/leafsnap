@@ -1,7 +1,9 @@
 package edu.maryland.leafsnap.model;
 
+import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.io.Serializable;
@@ -17,6 +19,8 @@ import java.util.Date;
 public class CollectedLeaf implements Serializable {
 
     private static final long serialVersionUID = 3262946905098294189L;
+    @ForeignCollectionField(eager = true)
+    private ForeignCollection<RankedSpecies> candidateSpecies;
     @DatabaseField(generatedId = true)
     private int id;
     @DatabaseField
@@ -43,7 +47,7 @@ public class CollectedLeaf implements Serializable {
     private LeafletUrl segmentedImageURL;
 
     public CollectedLeaf() {
-
+        leafID = -1;
     }
 
     public SyncStatus getSyncStatus() {
@@ -134,7 +138,40 @@ public class CollectedLeaf implements Serializable {
         this.segmentedImageURL = segmentedImageURL;
     }
 
+    public void addCandidateSpecies(RankedSpecies species) {
+        candidateSpecies.add(species);
+    }
+
+    public void removeCandidateSpecies(RankedSpecies species) {
+        candidateSpecies.remove(species);
+    }
+
+    public ForeignCollection<RankedSpecies> getCandidateSpecies() {
+        return candidateSpecies;
+    }
+
+    public void setCandidateSpecies(ForeignCollection<RankedSpecies> candidateSpecies) {
+        this.candidateSpecies = candidateSpecies;
+    }
+
+    public int getId() {
+        return id;
+    }
+
     public enum SyncStatus {
         SERVER_IS_NEWER, SAME, PHONE_IS_NEWER;
+    }
+
+    @Override
+    public boolean equals(Object object)
+    {
+        boolean sameSame = false;
+
+        if (object != null && object instanceof CollectedLeaf)
+        {
+            sameSame = this.leafID == ((CollectedLeaf) object).getLeafID();
+        }
+
+        return sameSame;
     }
 }

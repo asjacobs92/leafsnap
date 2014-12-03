@@ -13,26 +13,26 @@ import edu.maryland.leafsnap.activity.MainActivity;
  */
 public class TabUtils {
 
-    public static final int TAB_COUNT = 5;
+    public static final int TAB_COUNT = 4;
+
+    private static int currentTabPosition = 0;
+
+    private static boolean updateCurrentTab = true;
 
     private static final int[] tabsTitlesIds = {R.string.title_home_tab,
             R.string.title_browse_tab,
             R.string.title_collection_tab,
-            R.string.title_options_tab,
-            R.string.title_camera_tab};
-
-    private static final int[] tabsIconsIds = {
-            R.drawable.home_tab,
-            R.drawable.browse_tab,
-            R.drawable.collection_tab,
-            R.drawable.options_tab,
-            R.drawable.camera_tab};
+            R.string.title_options_tab};
 
     public static int getTabTitleId(int position) {
         return tabsTitlesIds[position];
     }
 
-    public static int getTabIconId(int position) {
-        return tabsIconsIds[position];
+    public static void setCurrentTabPosition(int position) { if (updateCurrentTab) currentTabPosition = position; }
+
+    public static int getCurrentTabPosition() { return currentTabPosition; }
+
+    public static void setUpdateCurrentTab(boolean update) {
+        updateCurrentTab = update;
     }
 }

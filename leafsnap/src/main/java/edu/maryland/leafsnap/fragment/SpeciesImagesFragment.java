@@ -1,9 +1,9 @@
 package edu.maryland.leafsnap.fragment;
 
-import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -20,47 +21,32 @@ import android.widget.TextView;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.ArrayList;
 
 import edu.maryland.leafsnap.R;
-import edu.maryland.leafsnap.activity.SpeciesAcitivity;
+import edu.maryland.leafsnap.activity.SpeciesActivity;
 import edu.maryland.leafsnap.data.DatabaseHelper;
 import edu.maryland.leafsnap.model.LeafletUrl;
 import edu.maryland.leafsnap.model.Species;
-import edu.maryland.leafsnap.util.SystemUiHider;
+import edu.maryland.leafsnap.util.MediaUtils;
+import uk.co.senab.photoview.PhotoViewAttacher;
 
 public class SpeciesImagesFragment extends Fragment {
 
-    /**
-     * If set, will toggle the system UI visibility upon interaction. Otherwise,
-     * will show the system UI visibility upon interaction.
-     */
-    private static final boolean TOGGLE_ON_CLICK = true;
+    private boolean mFullscreen = false;
 
-    /**
-     * The flags to pass to {@link edu.maryland.leafsnap.util.SystemUiHider#getInstance}.
-     */
-    private static final int HIDER_FLAGS = SystemUiHider.FLAG_HIDE_NAVIGATION;
-
-    /**
-     * The instance of the {@link SystemUiHider} for this activity.
-     */
-    private SystemUiHider mSystemUiHider;
+    private LinearLayout mImagePicker;
 
     private Species mSpecies;
-
-    private DatabaseHelper mDbHelper;
+    private PhotoViewAttacher mAttacher;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mDbHelper = OpenHelperManager.getHelper(getActivity(), DatabaseHelper.class);
         Bundle b = this.getArguments();
         if (b != null) {
-            mSpecies = (Species) b.getSerializable(SpeciesAcitivity.ARG_SPECIES);
+            mSpecies = (Species) b.getSerializable(SpeciesActivity.ARG_SPECIES);
         }
         return inflater.inflate(R.layout.fragment_species_images, container, false);
     }
@@ -68,8 +54,9 @@ public class SpeciesImagesFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        initImagePicker();
-        initImageDisplay();
+        mImagePicker = (LinearLayout) getActivity().findViewById(R.id.image_picker);
+        new PopulateImagePickerTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);;
+
     }
 
     @Override
@@ -86,76 +73,44 @@ public class SpeciesImagesFragment extends Fragment {
         if (imageLayout != null) {
             imageDisplay.setImageDrawable(((ImageView) imageLayout.getChildAt(0))
                     .getDrawable());
+            if (mAttacher == null) {
+                mAttacher = new PhotoViewAttacher(imageDisplay);
+            } else {
+                mAttacher.update();
+            }
         }
     }
 
     private void initImageDisplay() {
-        ImageView imageDisplay = (ImageView) getActivity().findViewById(R.id.image_display);
         setImageDisplayFirstLeaflet();
 
-        mSystemUiHider = SystemUiHider.getInstance(getActivity(), imageDisplay, HIDER_FLAGS);
-        mSystemUiHider.setup();
-        mSystemUiHider.setOnVisibilityChangeListener(getOnVisibilityChangeListener());
-
-        imageDisplay.setOnClickListener(new View.OnClickListener() {
+        mAttacher.setOnPhotoTapListener(new PhotoViewAttacher.OnPhotoTapListener() {
             @Override
-            public void onClick(View view) {
-                if (TOGGLE_ON_CLICK) {
-                    mSystemUiHider.toggle();
-                } else {
-                    mSystemUiHider.show();
-                }
+            public void onPhotoTap(View view, float v, float v2) {
+                toggleFullscreen(!mFullscreen);
             }
         });
     }
 
-    private SystemUiHider.OnVisibilityChangeListener getOnVisibilityChangeListener() {
-        return new SystemUiHider.OnVisibilityChangeListener() {
-            int mControlsHeight;
-            int mShortAnimTime;
+    private void toggleFullscreen(boolean fullscreen) {
+        mFullscreen = fullscreen;
+        WindowManager.LayoutParams attrs = getActivity().getWindow().getAttributes();
+        if (fullscreen) {
+            attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+            ((ActionBarActivity) getActivity()).getSupportActionBar().hide();
+        } else {
+            attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
+            ((ActionBarActivity) getActivity()).getSupportActionBar().show();
+        }
+        getActivity().getWindow().setAttributes(attrs);
 
-            @Override
-            @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-            public void onVisibilityChange(boolean visible) {
-                if (visible) {
-                    ((ActionBarActivity) getActivity()).getSupportActionBar().show();
-                } else {
-                    ((ActionBarActivity) getActivity()).getSupportActionBar().hide();
-                }
-
-                FrameLayout optionsBar = (FrameLayout) getActivity().findViewById(R.id.images_options_bar);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-                    if (mControlsHeight == 0) {
-                        mControlsHeight = optionsBar.getHeight();
-                    }
-
-                    if (mShortAnimTime == 0) {
-                        mShortAnimTime = getResources().getInteger(
-                                android.R.integer.config_shortAnimTime);
-                    }
-                    optionsBar.animate()
-                            .translationY(visible ? 0 : mControlsHeight)
-                            .setDuration(mShortAnimTime);
-                } else {
-                    optionsBar.setVisibility(visible ? View.VISIBLE : View.GONE);
-                }
-            }
-        };
-    }
-
-    private void initImagePicker() {
-        LinearLayout imagePicker = (LinearLayout) getActivity().findViewById(R.id.image_picker);
-        try {
-            List<LeafletUrl> leafletUrls = mDbHelper.getLeafletUrlDao().queryForEq("associatedSpecies_id",
-                    mSpecies.getId());
-            for (LeafletUrl leafletUrl : leafletUrls) {
-                Drawable d = getDrawableFromUrl(leafletUrl.getRawURL().replace("/species", "species"));
-                if (d != null) {
-                    imagePicker.addView(getSmallImageLayout(leafletUrl, d));
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        FrameLayout optionsBar = (FrameLayout) getActivity().findViewById(R.id.images_options_bar);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            optionsBar.animate()
+                .translationY(fullscreen ? optionsBar.getHeight() : 0)
+                .setDuration(getResources().getInteger(android.R.integer.config_shortAnimTime));
+        } else {
+            optionsBar.setVisibility(fullscreen ? View.GONE : View.VISIBLE);
         }
     }
 
@@ -168,6 +123,7 @@ public class SpeciesImagesFragment extends Fragment {
                 ImageView imageDisplay = (ImageView) getActivity().findViewById(R.id.image_display);
                 imageDisplay.setImageDrawable(((ImageView) view)
                         .getDrawable());
+                mAttacher.update();
                 return true;
             }
         });
@@ -200,13 +156,49 @@ public class SpeciesImagesFragment extends Fragment {
         return leafletType;
     }
 
-    private Drawable getDrawableFromUrl(String url) {
-        InputStream ims = null;
-        try {
-            ims = getActivity().getAssets().open(url);
-        } catch (IOException e) {
-            e.printStackTrace();
+    private class PopulateImagePickerTask extends AsyncTask<Void, Void, ArrayList<LeafletUrl>> {
+
+        private DatabaseHelper mDbHelper;
+
+        @Override
+        protected ArrayList<LeafletUrl> doInBackground(Void... params) {
+            ArrayList<LeafletUrl> leafletUrls = null;
+            try {
+                leafletUrls = (ArrayList<LeafletUrl>)
+                        getDbHelper().getLeafletUrlDao().queryForEq("associatedSpecies_id",
+                                mSpecies.getId());
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return leafletUrls;
         }
-        return Drawable.createFromStream(ims, null);
+
+        @Override
+        protected void onPostExecute(ArrayList<LeafletUrl> result) {
+            if (!result.isEmpty()) {
+                for (LeafletUrl leafletUrl : result) {
+                    Drawable d = MediaUtils.getDrawableFromAssets(getActivity(),
+                            leafletUrl.getRawURL().replace("/species", "species"));
+                    if (d != null) {
+                        mImagePicker.addView(getSmallImageLayout(leafletUrl, d));
+                    }
+                }
+                initImageDisplay();
+            }
+
+            if (mDbHelper != null) {
+                OpenHelperManager.releaseHelper();
+                mDbHelper = null;
+            }
+        }
+
+        private DatabaseHelper getDbHelper() {
+            if (mDbHelper == null) {
+                mDbHelper = OpenHelperManager.getHelper(getActivity(), DatabaseHelper.class);
+            }
+            return mDbHelper;
+        }
     }
+
+
 }

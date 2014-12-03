@@ -1,6 +1,7 @@
 package edu.maryland.leafsnap.api;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -13,6 +14,7 @@ import org.json.JSONObject;
 
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.List;
 
 import edu.maryland.leafsnap.data.DatabaseHelper;
 import edu.maryland.leafsnap.model.DatabaseInfo;
@@ -25,31 +27,39 @@ import edu.maryland.leafsnap.model.Species;
 public class LeafletDatabaseContentRequest {
 
     private Context mContext;
+    private boolean mFinished;
     private DatabaseHelper mDbHelper;
 
     public LeafletDatabaseContentRequest(Context context) {
-        setContext(context);
+        setFinished(false);
+        mContext = context;
     }
 
     public void fetchWholeDatabaseFromServer() {
         RequestParams params = new RequestParams();
         params.put("detailed", "1");
         params.put("fmt", "json");
-        LeafletAsyncRestClient.get("/species/", params, new JsonHttpResponseHandler() {
+        LeafletRestClient.get("/species/", params, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
+                Log.d("TAG", "SUCCESS");
                 try {
                     parseResult(response);
-                    LeafletImageManager imageManager = new LeafletImageManager(getContext());
-                    imageManager.consolidateDatabase();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                } catch (SQLException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
+                setFinished(true);
             }
-        });
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                Log.d("TAG", "FAILURE");
+                setFinished(true);
+                throwable.printStackTrace();
+            }
+        }, false);
     }
 
     private void parseResult(JSONObject result) throws JSONException, SQLException {
@@ -65,28 +75,34 @@ public class LeafletDatabaseContentRequest {
         getDbHelper().getDatabaseInfoDao().create(dbInfo);
     }
 
-    private void parseSpecies(JSONObject result) throws JSONException, SQLException {
-        JSONArray allJSONSpecies = result.getJSONArray("species");
+    private void parseSpecies(JSONObject response) throws JSONException, SQLException {
+        JSONArray allJSONSpecies = response.getJSONArray("species");
+        List<Species> result = getDbHelper().getSpeciesDao().queryForAll();
         for (int i = 0; i < allJSONSpecies.length(); i++) {
             JSONObject oneJSONSpecies = allJSONSpecies.getJSONObject(i);
-            Species oneSpecies = new Species();
-
-            oneSpecies.setPopularName(oneJSONSpecies.getString("popname"));
-            oneSpecies.setScientificName(oneJSONSpecies.getString("sciname"));
+            String popName = oneJSONSpecies.getString("popname");
+            String sciName = oneJSONSpecies.getString("sciname");
+            Species oneSpecies = new Species(popName, sciName);
             oneSpecies.setDescription(oneJSONSpecies.getString("description"));
 
-            oneSpecies = parseSpeciesData(oneJSONSpecies, oneSpecies);
+            if (!result.contains(oneSpecies)) {
+                oneSpecies = parseSpeciesData(oneJSONSpecies, oneSpecies);
 
-            JSONObject exampleImages = oneJSONSpecies.getJSONObject("examples");
-            oneSpecies = parseSpeciesExampleImages(oneSpecies, exampleImages);
+                JSONObject exampleImages = oneJSONSpecies.getJSONObject("examples");
+                oneSpecies = parseSpeciesExampleImages(oneSpecies, exampleImages);
 
-            JSONArray datasets = oneJSONSpecies.getJSONArray("datasets");
-            oneSpecies = parseSpeciesDatasets(oneSpecies, datasets);
+                JSONArray datasets = oneJSONSpecies.getJSONArray("datasets");
+                oneSpecies = parseSpeciesDatasets(oneSpecies, datasets);
 
-            getDbHelper().getSpeciesDao().create(oneSpecies);
+                getDbHelper().getSpeciesDao().create(oneSpecies);
 
-            JSONArray images = oneJSONSpecies.getJSONArray("images");
-            parseSpeciesImages(oneSpecies, images);
+                JSONArray images = oneJSONSpecies.getJSONArray("images");
+                parseSpeciesImages(oneSpecies, images);
+
+                LeafletImageManager imageManager = new LeafletImageManager(mContext);
+                imageManager.consolidateDatabase();
+                imageManager.close();
+            }
         }
     }
 
@@ -221,18 +237,25 @@ public class LeafletDatabaseContentRequest {
         return oneSpecies;
     }
 
-    private Context getContext() {
-        return mContext;
+    public boolean isFinished() {
+        return mFinished;
     }
 
-    private void setContext(Context mContext) {
-        this.mContext = mContext;
+    public void setFinished(boolean mFinished) {
+        this.mFinished = mFinished;
     }
 
     private DatabaseHelper getDbHelper() {
         if (mDbHelper == null) {
-            mDbHelper = OpenHelperManager.getHelper(getContext(), DatabaseHelper.class);
+            mDbHelper = OpenHelperManager.getHelper(mContext, DatabaseHelper.class);
         }
         return mDbHelper;
+    }
+
+    public void close() {
+        if (mDbHelper != null) {
+            OpenHelperManager.releaseHelper();
+            mDbHelper = null;
+        }
     }
 }

@@ -1,0 +1,83 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="edu.maryland.leafsnap.activity.CameraActivity">
+
+    <FrameLayout
+        android:id="@+id/camera_preview"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:fitsSystemWindows="true">
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="80dp"
+            android:background="@drawable/camera_photo_placeholder"
+            android:layout_gravity="center_horizontal|top">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/white_bg_instr"
+                android:id="@+id/white_bg_instr"
+                android:paddingTop="40dp"
+                android:layout_gravity="center_horizontal" />
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="140dp"
+            android:background="@drawable/camera_photo_placeholder"
+            android:layout_gravity="center_horizontal|bottom">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/center_leaf_instr"
+                android:id="@+id/center_leaf_instr"
+                android:paddingTop="5dp"
+                android:layout_gravity="center_horizontal" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/button_snap_it"
+            android:background="@drawable/ic_camera_snap"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginBottom="20dp"
+            android:onClick="onCaptureButtonClick"
+            android:layout_gravity="center_horizontal|bottom" />
+
+        <Button
+            android:id="@+id/button_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_camera_cancel"
+            android:layout_marginBottom="20dp"
+            android:layout_marginStart="40dp"
+            android:onClick="onCancelButtonClick"
+            android:layout_gravity="start|bottom|center_horizontal" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_camera_gallery"
+            android:id="@+id/button_gallery"
+            android:onClick="onGalleryButtonClick"
+            android:layout_marginBottom="20dp"
+            android:layout_marginEnd="40dp"
+            android:layout_gravity="end|bottom" />
+
+
+    </FrameLayout>
+
+</RelativeLayout>

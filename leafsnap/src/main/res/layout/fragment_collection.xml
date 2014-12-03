@@ -1,17 +1,129 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE xml>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:columnCount="3"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:background="@color/black">
 
-    <TextView
-        android:id="@+id/rand_thumb_text"
+    <RelativeLayout
+        android:id="@+id/collection_view"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/todo"
-        android:textColor="@color/white" />
+        android:layout_height="wrap_content">
 
+        <RelativeLayout
+            android:id="@+id/list_collection_view"
+            android:visibility="visible"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:alpha="0.8"
+                android:background="@color/list_header_grey"
+                android:padding="5dp"
+                android:id="@+id/relativeLayout">
+
+                <TextView
+                    android:text="User's collection"
+                    android:id="@+id/collection_list_header"
+                    android:layout_height="wrap_content"
+                    android:layout_width="fill_parent"
+                    android:layout_gravity="start"
+                    android:textColor="@color/white"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:layout_toLeftOf="@+id/edit_button"
+                    android:layout_toStartOf="@+id/edit_button" />
+
+                <Button
+                    android:id="@+id/edit_button"
+                    android:text="Edit"
+                    android:background="@drawable/header_button_shape"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:minHeight="20dp"
+                    android:minWidth="50dp"
+                    android:gravity="center"
+                    android:layout_marginEnd="2dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true" />
+
+            </RelativeLayout>
+
+            <ListView
+                android:id="@+id/collection_list"
+                android:textColor="@color/white"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:drawSelectorOnTop="true"
+                android:fastScrollEnabled="true"
+                android:listSelector="@drawable/listview_selector"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/relativeLayout" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/map_collection_view"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <com.google.android.gms.maps.MapView
+                android:id="@+id/map_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+        </RelativeLayout>
+
+        <Switch
+            android:id="@+id/map_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:switchMinWidth="100dp"
+            android:textOn="Map"
+            android:textOff="List"
+            android:thumb="@drawable/leafsnap_switch_inner_holo_dark"
+            android:track="@drawable/leafsnap_switch_track_holo_dark"
+            android:paddingBottom="20dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/empty_collection_view"
+        android:visibility="gone"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/textView"
+            android:textColor="@color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/empty_collection"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="45dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/start_collection"
+            android:layout_below="@+id/textView"
+            android:layout_centerHorizontal="true"
+            android:padding="50dp" />
+    </RelativeLayout>
 </LinearLayout>

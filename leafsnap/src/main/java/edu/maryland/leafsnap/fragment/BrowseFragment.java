@@ -1,8 +1,8 @@
 package edu.maryland.leafsnap.fragment;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import edu.maryland.leafsnap.R;
-import edu.maryland.leafsnap.activity.SpeciesAcitivity;
+import edu.maryland.leafsnap.activity.SpeciesActivity;
 import edu.maryland.leafsnap.adapter.SpeciesListAdapter;
 import edu.maryland.leafsnap.data.DatabaseHelper;
 import edu.maryland.leafsnap.model.Species;
@@ -27,8 +27,11 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 public class BrowseFragment extends Fragment {
 
-    private DatabaseHelper mDbHelper;
-    private SpeciesListAdapter mListAdapter;
+    private EditText mSearchSpecies;
+    private StickyListHeadersListView mSpeciesList;
+
+    private ArrayList<Species> mAllSpecies;
+    private SpeciesListAdapter mSpeciesAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -39,68 +42,80 @@ public class BrowseFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        StickyListHeadersListView speciesList = (StickyListHeadersListView)
+        mAllSpecies = new ArrayList<Species>();
+        mSpeciesAdapter = new SpeciesListAdapter(getActivity(), mAllSpecies);
+
+        mSearchSpecies = (EditText) getActivity().findViewById(R.id.search_species);
+        mSearchSpecies.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable arg0) {
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                mSpeciesAdapter.getFilter().filter(s);
+            }
+        });
+
+        mSpeciesList = (StickyListHeadersListView)
                 getActivity().findViewById(R.id.species_list);
-        ArrayList<Species> allSpecies = getSpeciesList();
-        if (allSpecies != null) {
-            Collections.sort(allSpecies);
+        mSpeciesList.setAdapter(mSpeciesAdapter);
 
-            mListAdapter = new SpeciesListAdapter(getActivity(), allSpecies);
-            speciesList.setAdapter(mListAdapter);
-            final EditText searchSpecies = (EditText) getActivity().findViewById(R.id.search_species);
-            searchSpecies.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void afterTextChanged(Editable arg0) {
-                }
+        mSpeciesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Intent intent = new Intent(getActivity(), SpeciesActivity.class);
+                Bundle args = new Bundle();
+                args.putSerializable(SpeciesActivity.ARG_SPECIES, mSpeciesAdapter.getItem(position));
+                intent.putExtras(args);
+                getActivity().startActivity(intent);
+                mSearchSpecies.setText("");
+                mSearchSpecies.clearFocus();
+            }
+        });
 
-                @Override
-                public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    mListAdapter.getFilter().filter(s);
-                }
-            });
-
-            speciesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                    Intent intent = new Intent(getActivity(), SpeciesAcitivity.class);
-                    Bundle args = new Bundle();
-                    args.putSerializable(SpeciesAcitivity.ARG_SPECIES, mListAdapter.getItem(position));
-                    intent.putExtras(args);
-                    getActivity().startActivity(intent);
-                    searchSpecies.setText("");
-                }
-            });
-        }
+        new PopulateSpeciesListTask().execute();
     }
 
-    private ArrayList<Species> getSpeciesList() {
-        ArrayList<Species> speciesList = null;
-        try {
-            speciesList = (ArrayList<Species>) getDbHelper().getSpeciesDao().queryForAll();
-        } catch (SQLException e) {
-            e.printStackTrace();
+    private class PopulateSpeciesListTask extends AsyncTask<Void, Void, ArrayList<Species>> {
+
+        private DatabaseHelper mDbHelper;
+
+        @Override
+        protected ArrayList<Species> doInBackground(Void... params) {
+            ArrayList<Species> speciesList = null;
+            try {
+                speciesList = (ArrayList<Species>) getDbHelper().getSpeciesDao().queryForAll();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return speciesList;
         }
-        return speciesList;
-    }
 
-    public DatabaseHelper getDbHelper() {
-        if (mDbHelper == null) {
-            mDbHelper = OpenHelperManager.getHelper(getActivity(), DatabaseHelper.class);
+        @Override
+        protected void onPostExecute(ArrayList<Species> result) {
+            if (result != null) {
+                Collections.sort(result);
+                mAllSpecies.clear();
+                mAllSpecies.addAll(result);
+                mSpeciesAdapter.notifyDataSetChanged();
+            }
+
+            if (mDbHelper != null) {
+                OpenHelperManager.releaseHelper();
+                mDbHelper = null;
+            }
         }
-        return mDbHelper;
-    }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        if (mDbHelper != null) {
-            OpenHelperManager.releaseHelper();
-            mDbHelper = null;
+        private DatabaseHelper getDbHelper() {
+            if (mDbHelper == null) {
+                mDbHelper = OpenHelperManager.getHelper(getActivity(), DatabaseHelper.class);
+            }
+            return mDbHelper;
         }
     }
 }

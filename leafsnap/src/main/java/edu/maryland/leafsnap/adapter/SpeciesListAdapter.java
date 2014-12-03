@@ -2,7 +2,9 @@ package edu.maryland.leafsnap.adapter;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +21,7 @@ import java.util.Locale;
 
 import edu.maryland.leafsnap.R;
 import edu.maryland.leafsnap.model.Species;
+import edu.maryland.leafsnap.util.MediaUtils;
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
 /**
@@ -32,7 +35,7 @@ public class SpeciesListAdapter extends ArrayAdapter<Species> implements StickyL
     private ArrayList<Species> mOriginalSpeciesList;
 
     public SpeciesListAdapter(Context context, ArrayList<Species> speciesList) {
-        super(context, R.layout.species_list_item, speciesList);
+        super(context, R.layout.list_item, speciesList);
         this.mSpeciesList = this.mOriginalSpeciesList = speciesList;
     }
 
@@ -51,7 +54,7 @@ public class SpeciesListAdapter extends ArrayAdapter<Species> implements StickyL
         ViewHolder holder;
 
         if (convertView == null) {
-            convertView = getLayoutInflater().inflate(R.layout.species_list_item, parent, false);
+            convertView = getLayoutInflater().inflate(R.layout.list_item, parent, false);
             holder = new ViewHolder();
             holder.text = (TextView) convertView.findViewById(R.id.item_text);
             holder.subtext = (TextView) convertView.findViewById(R.id.item_subtext);
@@ -64,8 +67,7 @@ public class SpeciesListAdapter extends ArrayAdapter<Species> implements StickyL
         Species species = getItem(position);
         holder.text.setText(species.getCommomName());
         holder.subtext.setText(species.getScientificName());
-        holder.image.setImageDrawable(getDrawableFromUrl(
-                species.getExampleImageFlower().getRawURL().replace("/species", "species").split("\\?")[0]));
+        new LoadItemImageTask(species, holder).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
         return convertView;
     }
@@ -78,13 +80,12 @@ public class SpeciesListAdapter extends ArrayAdapter<Species> implements StickyL
         return mFilter;
     }
 
-
     @Override
     public View getHeaderView(int position, View convertView, ViewGroup parent) {
         HeaderViewHolder holder;
         if (convertView == null) {
             holder = new HeaderViewHolder();
-            convertView = getLayoutInflater().inflate(R.layout.species_list_section_header, parent, false);
+            convertView = getLayoutInflater().inflate(R.layout.list_section_header, parent, false);
             holder.text = (TextView) convertView.findViewById(R.id.section_header);
             convertView.setTag(holder);
         } else {
@@ -99,31 +100,6 @@ public class SpeciesListAdapter extends ArrayAdapter<Species> implements StickyL
     @Override
     public long getHeaderId(int position) {
         return mSpeciesList.get(position).getCommomName().subSequence(0, 1).charAt(0);
-    }
-
-    private Drawable getDrawableFromUrl(String url) {
-        InputStream ims = null;
-        try {
-            ims = getContext().getAssets().open(url);
-            /*if (isExternalStorageReadable()) {
-                File imageFile = new File(getContext().getExternalFilesDir(
-                        Environment.DIRECTORY_PICTURES), url);
-                ims = new FileInputStream(imageFile);
-            }*/
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return Drawable.createFromStream(ims, null);
-    }
-
-    /* Checks if external storage is available to at least read */
-    public boolean isExternalStorageReadable() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state) ||
-                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-            return true;
-        }
-        return false;
     }
 
     public LayoutInflater getLayoutInflater() {
@@ -165,6 +141,31 @@ public class SpeciesListAdapter extends ArrayAdapter<Species> implements StickyL
         protected void publishResults(CharSequence constraint, FilterResults results) {
             mSpeciesList = (ArrayList<Species>) results.values;
             notifyDataSetChanged();
+        }
+    }
+
+    private class LoadItemImageTask extends AsyncTask<Void, Void, Drawable> {
+
+        private Species mSpecies;
+        private ViewHolder mHolder;
+
+        public LoadItemImageTask(Species species, ViewHolder holder) {
+            mSpecies = species;
+            mHolder = holder;
+        }
+
+        @Override
+        protected Drawable doInBackground(Void... arg0) {
+            return MediaUtils.getDrawableFromAssets(getContext(),
+                    mSpecies.getExampleImageLeaf().getRawURL().replace("/species", "species").split("\\?")[0]);
+
+        }
+
+        @Override
+        protected void onPostExecute(Drawable drawable) {
+            if (drawable != null) {
+                mHolder.image.setImageDrawable(drawable);
+            }
         }
     }
 }

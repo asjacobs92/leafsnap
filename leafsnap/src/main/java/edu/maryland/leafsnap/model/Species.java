@@ -1,6 +1,8 @@
 package edu.maryland.leafsnap.model;
 
+import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.io.Serializable;
@@ -43,6 +45,9 @@ public class Species implements Serializable, Comparable<Species> {
     private LeafletUrl exampleImageLeaf;
     @DatabaseField(foreign = true, foreignAutoRefresh = true)
     private LeafletUrl exampleImageFruit;
+
+    @ForeignCollectionField(eager = false)
+    private ForeignCollection<RankedSpecies> associatedRankedSpecies;
 
     public Species() {
         setDataset(0);
@@ -163,6 +168,28 @@ public class Species implements Serializable, Comparable<Species> {
      */
     @Override
     public int compareTo(Species another) {
-        return this.getCommomName().compareTo(another.getCommomName());
+        if (another != null) {
+            return this.getCommomName().compareTo(another.getCommomName());
+        }
+        return -1;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        boolean sameSame = false;
+
+        if (object != null && object instanceof Species) {
+            sameSame = this.getCommomName().contentEquals(((Species) object).getCommomName());
+        }
+
+        return sameSame;
+    }
+
+    public ForeignCollection<RankedSpecies> getAssociatedRankedSpecies() {
+        return associatedRankedSpecies;
+    }
+
+    public void setAssociatedRankedSpecies(ForeignCollection<RankedSpecies> associatedRankedSpecies) {
+        this.associatedRankedSpecies = associatedRankedSpecies;
     }
 }

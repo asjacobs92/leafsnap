@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name" translatable="false">Leafsnap</string>
     <string name="title_home_tab" translatable="false">Home</string>
     <string name="title_browse_tab" translatable="false">Browse</string>
     <string name="title_collection_tab" translatable="false">Collection</string>
     <string name="title_options_tab" translatable="false">Options</string>
-    <string name="title_camera_tab" translatable="false">Snap it!</string>
+    <string name="title_action_snap" translatable="false">Snap it!</string>
     <string name="action_about" translatable="false">About</string>
     <string name="action_help" translatable="false">Help</string>
     <string name="tab_icon_description" translatable="false">Tab icon.</string>
@@ -51,5 +50,29 @@
     <string name="login_warning">Please login first.</string>
     <string name="collection_sync_success">Collection successfully synced.</string>
     <string name="collection_sync_progress">User collection sync in progress.</string>
+    <string name="empty_collection">You haven\'t done any collecting yet.</string>
+    <string name="start_collection">Start your collection by tapping on the Snap It! button</string>
+    <string name="title_activity_collected_leaf">CollectedLeafActivity</string>
+    <string name="snap_results">Snap It! Results</string>
+    <string name="user_collection">\'s Collection</string>
+    <string name="unlabeled_species">Unlabeled species</string>
+    <string name="collected">Collected </string>
+    <string name="title_activity_camera">CameraActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="white_bg_instr">Place leaf on a white background.</string>
+    <string name="center_leaf_instr">Center leaf in the frame.</string>
+    <string name="gallery">Gallery</string>
+    <string name="cancel">Cancel</string>
+    <string name="title_activity_upload_image_activty">Uploading Image</string>
+    <string name="uploading_image">Uploading image.</string>
+    <string name="action">Action</string>
+    <string name="delete">Delete</string>
+    <string name="label">Label</string>
+    <string name="confirm_delete">Are you sure you want to delete?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="deletion_error">"Deletion failed, most likely to the lack of connectivity."</string>
+    <string name="labeling_error">"Labeling failed, most likely to the lack of connectivity."</string>
 
 </resources>

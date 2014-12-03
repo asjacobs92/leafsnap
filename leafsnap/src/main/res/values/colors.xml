@@ -7,5 +7,5 @@
     <color name="leafsnap_green">#91AF00</color>
     <color name="white_overlay">#22FFFFFF</color>
     <color name="list_header_grey">#4D4D4D</color>
-
+    <color name="black_overlay">#66000000</color>
 </resources>
