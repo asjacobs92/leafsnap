@@ -1,10 +1,15 @@
 package edu.maryland.leafsnap.activity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -45,7 +50,7 @@ public class CollectedLeafActivity extends ActionBarActivity {
             }
 
             ListView resultsList = (ListView) findViewById(R.id.results_list);
-            ImageView originalImage = (ImageView) findViewById(R.id.collected_leaf_display);
+            final ImageView originalImage = (ImageView) findViewById(R.id.collected_leaf_display);
             final ImageView segmentedImage = (ImageView) findViewById(R.id.segmented_leaf_display);
 
             originalImage.setImageDrawable(MediaUtils.getDrawableFromExternalStorage(this,
@@ -53,15 +58,37 @@ public class CollectedLeafActivity extends ActionBarActivity {
             segmentedImage.setImageDrawable(MediaUtils.getDrawableFromExternalStorage(this,
                     mCollectedLeaf.getSegmentedImageURL().getRawURL()));
 
-            originalImage.animate().translationX(-(1.5f)*originalImage.getDrawable().getIntrinsicWidth())
-                    .setDuration(1000).setStartDelay(1000).start();
-            segmentedImage.animate().translationX((1.6f)*segmentedImage.getDrawable().getIntrinsicWidth())
-                    .setDuration(1000).setStartDelay(1000).withEndAction(new Runnable() {
-                @Override
-                public void run() {
-                    segmentedImage.setAlpha(1f);
+
+            ViewTreeObserver originalVto = originalImage.getViewTreeObserver();
+            originalVto.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                public boolean onPreDraw() {
+                    int finalWidth;
+                    // Remove after the first run so it doesn't fire forever
+                    originalImage.getViewTreeObserver().removeOnPreDrawListener(this);
+                    finalWidth = originalImage.getMeasuredWidth();
+                    originalImage.animate().translationX(-(0.6f) * finalWidth)
+                            .setDuration(1000).setStartDelay(1000).start();
+                    return true;
                 }
-            }).start();
+            });
+
+            ViewTreeObserver segmentedVto = originalImage.getViewTreeObserver();
+            segmentedVto.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                public boolean onPreDraw() {
+                    int finalWidth;
+                    // Remove after the first run so it doesn't fire forever
+                    segmentedImage.getViewTreeObserver().removeOnPreDrawListener(this);
+                    finalWidth = segmentedImage.getMeasuredWidth();
+                    segmentedImage.animate().translationX((0.6f)*finalWidth)
+                            .setDuration(1000).setStartDelay(1000).withEndAction(new Runnable() {
+                        @Override
+                        public void run() {
+                            segmentedImage.setAlpha(1f);
+                        }
+                    }).start();
+                    return true;
+                }
+            });
 
             mCandidateSpecies = new ArrayList<RankedSpecies>();
             mRankedListAdapter = new RankedSpeciesListAdapter(this, mCandidateSpecies);
