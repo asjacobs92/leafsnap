@@ -34,7 +34,7 @@
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="fill_parent"
-            android:layout_height="120dp"
+            android:layout_height="140dp"
             android:background="@drawable/camera_photo_placeholder"
             android:layout_gravity="center_horizontal|bottom">
 
@@ -50,9 +50,10 @@
 
         <Button
             android:id="@+id/button_snap_it"
-            android:text="@string/title_action_snap"
-            android:layout_width="100dp"
+            android:background="@drawable/ic_camera_snap"
+            android:layout_width="80dp"
             android:layout_height="80dp"
+            android:layout_marginBottom="20dp"
             android:onClick="onCaptureButtonClick"
             android:layout_gravity="center_horizontal|bottom" />
 
@@ -60,16 +61,20 @@
             android:id="@+id/button_cancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/cancel"
+            android:background="@drawable/ic_camera_cancel"
+            android:layout_marginBottom="20dp"
+            android:layout_marginStart="40dp"
             android:onClick="onCancelButtonClick"
             android:layout_gravity="start|bottom|center_horizontal" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/gallery"
+            android:background="@drawable/ic_camera_gallery"
             android:id="@+id/button_gallery"
             android:onClick="onGalleryButtonClick"
+            android:layout_marginBottom="20dp"
+            android:layout_marginEnd="40dp"
             android:layout_gravity="end|bottom" />
 
 

@@ -26,20 +26,6 @@
             android:layout_centerHorizontal="true" />
 
         <Button
-            android:id="@+id/camera_button"
-            android:text="@string/option_photo_size"
-            android:layout_width="@dimen/options_button_width"
-            android:layout_height="@dimen/options_button_height"
-            android:textColor="@color/white"
-            android:drawableLeft="@drawable/ic_action_camera"
-            android:drawableRight="@drawable/ic_action_next_item"
-            android:gravity="left|center_vertical"
-            android:layout_gravity="center_horizontal"
-            android:layout_below="@+id/account_button"
-            android:layout_alignLeft="@+id/account_button"
-            android:layout_alignStart="@+id/account_button" />
-
-        <Button
             android:id="@+id/database_button"
             android:text="@string/option_database"
             android:layout_width="@dimen/options_button_width"
@@ -49,9 +35,8 @@
             android:drawableRight="@drawable/ic_action_next_item"
             android:gravity="left|center_vertical"
             android:layout_gravity="center_horizontal"
-            android:layout_below="@+id/camera_button"
-            android:layout_alignLeft="@+id/camera_button"
-            android:layout_alignStart="@+id/camera_button" />
+            android:layout_below="@+id/account_button"
+            android:layout_alignLeft="@+id/account_button" />
 
         <TextView
             android:id="@+id/current_user"

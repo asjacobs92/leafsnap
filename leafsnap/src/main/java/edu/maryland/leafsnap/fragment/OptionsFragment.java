@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import edu.maryland.leafsnap.R;
 import edu.maryland.leafsnap.activity.OptionsAccountActivity;
-import edu.maryland.leafsnap.activity.OptionsCameraActivity;
 import edu.maryland.leafsnap.activity.OptionsDatabaseActivity;
 import edu.maryland.leafsnap.util.SessionManager;
 
@@ -33,7 +32,6 @@ public class OptionsFragment extends Fragment {
     public void onStart() {
         super.onStart();
         setAccountButtonListener();
-        setCameraButtonListener();
         setDatabaseButtonListener();
         setCurrentUsername();
     }
@@ -59,16 +57,6 @@ public class OptionsFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 getActivity().startActivity(new Intent(getActivity(), OptionsAccountActivity.class));
-            }
-        });
-    }
-
-    private void setCameraButtonListener() {
-        Button cameraButton = (Button) getActivity().findViewById(R.id.camera_button);
-        cameraButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getActivity().startActivity(new Intent(getActivity(), OptionsCameraActivity.class));
             }
         });
     }

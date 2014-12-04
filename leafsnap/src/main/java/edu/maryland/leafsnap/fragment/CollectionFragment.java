@@ -4,18 +4,33 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import edu.maryland.leafsnap.R;
 import edu.maryland.leafsnap.activity.CollectedLeafActivity;
@@ -29,11 +44,17 @@ public class CollectionFragment extends Fragment {
     private SessionManager mSessionManager;
 
     private View mCollectionView;
+    private View mMapCollectionView;
+    private View mListCollectionView;
     private View mEmptyCollectionView;
 
+    private MapView mapView;
+    private GoogleMap mCollectionMap;
     private TextView mCollectionHeader;
     private CollectionListAdapter mCollectionAdapter;
     private ArrayList<CollectedLeaf> mCollectedSpecies;
+
+    private HashMap<String, CollectedLeaf> mMarkerLeafMap;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,8 +62,75 @@ public class CollectionFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_collection, container, false);
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        final View v = inflater.inflate(R.layout.fragment_collection, container, false);
+
+        // Gets the MapView from the XML layout and creates it
+        mapView = (MapView) v.findViewById(R.id.map_view);
+        mapView.onCreate(savedInstanceState);
+
+        // Gets to GoogleMap from the MapView and does initialization stuff
+        mCollectionMap = mapView.getMap();
+        mCollectionMap.getUiSettings().setMyLocationButtonEnabled(false);
+        mCollectionMap.setMyLocationEnabled(true);
+        mCollectionMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+
+            final View view = inflater.inflate(R.layout.marker_info_window, null, false);
+
+            @Override
+            public View getInfoWindow(Marker marker) {
+                return null;
+            }
+
+            @Override
+            public View getInfoContents(Marker marker) {
+                final CollectedLeaf leaf = mMarkerLeafMap.get(marker.getId());
+
+                if (leaf != null) {
+                    String label = getActivity().getString(R.string.unlabeled_species);
+                    if (leaf.getSelectedSpeciesRel() != null) {
+                        label = leaf.getSelectedSpeciesRel().getScientificName();
+                    }
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                    Date date = leaf.getCollectedDate();
+
+                    TextView title = (TextView) view.findViewById(R.id.window_title);
+                    title.setText(label);
+
+                    TextView snippet = (TextView) view.findViewById(R.id.window_snippet);
+                    snippet.setText(getActivity().getString(R.string.collected) + " " +
+                            dateFormat.format(date));
+                }
+
+                return view;
+            }
+        });
+
+        mCollectionMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                final CollectedLeaf leaf = mMarkerLeafMap.get(marker.getId());
+                if (leaf != null) {
+                    Log.d("TAAAG", leaf.getLeafID() + "");
+                    Intent intent = new Intent(getActivity(), CollectedLeafActivity.class);
+                    Bundle args = new Bundle();
+                    args.putSerializable(CollectedLeafActivity.ARG_COLLECTED_LEAF, leaf);
+                    intent.putExtras(args);
+                    getActivity().startActivity(intent);
+                }
+                else {
+                    Log.d("TAAAG", "Something is wrong " + marker.getId() + marker.getTitle() + marker.getSnippet());
+                }
+            }
+        });
+
+        // Needs to call MapsInitializer before doing any CameraUpdateFactory calls
+        try {
+            MapsInitializer.initialize(this.getActivity());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return v;
     }
 
     @Override
@@ -50,11 +138,13 @@ public class CollectionFragment extends Fragment {
         super.onStart();
 
         mCollectionView = getActivity().findViewById(R.id.collection_view);
+        mMapCollectionView = getActivity().findViewById(R.id.map_collection_view);
+        mListCollectionView = getActivity().findViewById(R.id.list_collection_view);
         mEmptyCollectionView = getActivity().findViewById(R.id.empty_collection_view);
         mCollectionHeader = (TextView) getActivity().findViewById(R.id.collection_list_header);
 
         mCollectedSpecies = new ArrayList<CollectedLeaf>();
-        mCollectionAdapter = new CollectionListAdapter(getActivity(), mCollectedSpecies);
+        mCollectionAdapter = new CollectionListAdapter(this, mCollectedSpecies);
 
         final ListView mCollectionList = (ListView) getActivity().findViewById(R.id.collection_list);
         mCollectionList.setAdapter(mCollectionAdapter);
@@ -69,25 +159,63 @@ public class CollectionFragment extends Fragment {
             }
         });
 
-        final Button editButton = (Button) getActivity().findViewById(R.id.edit_button);
+        Button editButton = (Button) getActivity().findViewById(R.id.edit_button);
         editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mCollectionAdapter.isActionButtonVisible()) {
-                    mCollectionAdapter.setActionButtonVisible(false);
-                    editButton.setBackgroundResource(R.drawable.header_button_shape);
+                toggleEditButton();
+            }
+        });
+
+        Switch mapSwitch = (Switch) getActivity().findViewById(R.id.map_switch);
+        mapSwitch.setChecked(false);
+        mapSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    new PopulateCollectionMapTask().execute();
+                    mMapCollectionView.setVisibility(View.VISIBLE);
+                    mListCollectionView.setVisibility(View.GONE);
                 } else {
-                    mCollectionAdapter.setActionButtonVisible(true);
-                    editButton.setBackgroundResource(R.drawable.header_button_shape_toggled);
+                    mMapCollectionView.setVisibility(View.GONE);
+                    mListCollectionView.setVisibility(View.VISIBLE);
                 }
-                mCollectionAdapter.notifyDataSetChanged();
             }
         });
 
         new PopulateCollectionListTask().execute();
     }
 
-    private void setFragmentView() {
+    public void toggleEditButton() {
+        Button editButton = (Button) getActivity().findViewById(R.id.edit_button);
+        if (mCollectionAdapter.isActionButtonVisible()) {
+            mCollectionAdapter.setActionButtonVisible(false);
+            editButton.setBackgroundResource(R.drawable.header_button_shape);
+        } else {
+            mCollectionAdapter.setActionButtonVisible(true);
+            editButton.setBackgroundResource(R.drawable.header_button_shape_toggled);
+        }
+        mCollectionAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onResume() {
+        mapView.onResume();
+        super.onResume();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mapView.onDestroy();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mapView.onLowMemory();
+    }
+
+    public void setFragmentView() {
         if (hasUserCollected()) {
             mCollectionView.setVisibility(View.VISIBLE);
             mEmptyCollectionView.setVisibility(View.GONE);
@@ -147,6 +275,42 @@ public class CollectionFragment extends Fragment {
                 mDbHelper = OpenHelperManager.getHelper(getActivity(), DatabaseHelper.class);
             }
             return mDbHelper;
+        }
+    }
+
+    private class PopulateCollectionMapTask extends AsyncTask<Void, Void, HashMap<MarkerOptions, CollectedLeaf>> {
+
+        @Override
+        protected HashMap<MarkerOptions, CollectedLeaf> doInBackground(Void... params) {
+            HashMap<MarkerOptions, CollectedLeaf> markersOptions = new HashMap<MarkerOptions, CollectedLeaf>();
+            if (mCollectedSpecies != null && !mCollectedSpecies.isEmpty()) {
+                for (CollectedLeaf leaf : mCollectedSpecies) {
+                    if (leaf.getLatitude() != null && leaf.getLongitude() != null) {
+                        LatLng pos = new LatLng(Double.valueOf(leaf.getLatitude()), Double.valueOf(leaf.getLongitude()));
+                        MarkerOptions markerOptions = new MarkerOptions()
+                                .position(pos).anchor(0, 1);
+
+                        markersOptions.put(markerOptions, leaf);
+                    }
+                }
+            }
+
+            return markersOptions;
+        }
+
+        @Override
+        protected void onPostExecute(HashMap<MarkerOptions, CollectedLeaf> result) {
+            mCollectionMap.clear();
+            if (!result.isEmpty()) {
+                mMarkerLeafMap = new HashMap<String, CollectedLeaf>();
+                for (Map.Entry<MarkerOptions, CollectedLeaf> entry : result.entrySet()) {
+                    mMarkerLeafMap.put(mCollectionMap.addMarker(entry.getKey()).getId(), entry.getValue());
+                }
+                MarkerOptions mrkOpt = (MarkerOptions) result.keySet().toArray()[0];
+                // Updates the location and zoom of the MapView
+                CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(mrkOpt.getPosition(), 10);
+                mCollectionMap.animateCamera(cameraUpdate);
+            }
         }
     }
 }

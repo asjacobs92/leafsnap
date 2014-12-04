@@ -9,10 +9,13 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBar.Tab;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 
 import edu.maryland.leafsnap.R;
 import edu.maryland.leafsnap.adapter.SectionsPagerAdapter;
@@ -36,7 +39,11 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             new CollectionFragment(),
             new OptionsFragment()
     };
+
+    private ArrayList<Tab> mTabs;
+
     private ViewPager mViewPager;
+    private ActionBar mActionBar;
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
     @Override
@@ -47,13 +54,29 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         setupActionBar();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        TabUtils.setUpdateCurrentTab(true);
+        mActionBar.selectTab(mTabs.get(TabUtils.getCurrentTabPosition()));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        TabUtils.setUpdateCurrentTab(false);
+    }
+
     private void setupActionBar() {
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        mActionBar = getSupportActionBar();
+        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         setupPageViewer();
 
+        mTabs = new ArrayList<Tab>();
         for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
-            actionBar.addTab(actionBar.newTab().setText(TabUtils.getTabTitleId(i)).setTabListener(this));
+            Tab t = mActionBar.newTab().setText(TabUtils.getTabTitleId(i)).setTabListener(this);
+            mTabs.add(t);
+            mActionBar.addTab(t);
         }
     }
 
@@ -103,6 +126,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+        TabUtils.setCurrentTabPosition(tab.getPosition());
         mViewPager.setCurrentItem(tab.getPosition());
     }
 

@@ -4,9 +4,11 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -31,7 +33,9 @@ import edu.maryland.leafsnap.activity.CollectedLeafActivity;
 import edu.maryland.leafsnap.api.LeafletPhotoUploader;
 import edu.maryland.leafsnap.api.LeafletUserCollectionRequest;
 import edu.maryland.leafsnap.data.DatabaseHelper;
+import edu.maryland.leafsnap.fragment.CollectionFragment;
 import edu.maryland.leafsnap.model.CollectedLeaf;
+import edu.maryland.leafsnap.model.Species;
 import edu.maryland.leafsnap.util.MediaUtils;
 
 /**
@@ -43,10 +47,12 @@ public class CollectionListAdapter extends ArrayAdapter<CollectedLeaf> {
 
     private boolean mActionButtonVisible = false;
     private LayoutInflater mInflater;
+    private CollectionFragment mFragment;
     private ArrayList<CollectedLeaf> mCollectionList;
 
-    public CollectionListAdapter(Context context, ArrayList<CollectedLeaf> collectionList) {
-        super(context, R.layout.list_item, collectionList);
+    public CollectionListAdapter(CollectionFragment fragment, ArrayList<CollectedLeaf> collectionList) {
+        super(fragment.getActivity(), R.layout.list_item, collectionList);
+        mFragment = fragment;
         mCollectionList = collectionList;
     }
 
@@ -87,8 +93,7 @@ public class CollectionListAdapter extends ArrayAdapter<CollectedLeaf> {
         Date date = collectedLeaf.getCollectedDate();
         holder.subtext.setText(getContext().getString(R.string.collected) + " " +
                 dateFormat.format(date));
-        holder.image.setImageDrawable(MediaUtils.getDrawableFromExternalStorage(getContext(),
-                collectedLeaf.getOriginalImageURL().getRawURL()));
+        new LoadItemImageTask(collectedLeaf, holder).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
         holder.actionButton.setText(getContext().getString(R.string.delete));
         holder.actionButton.setBackgroundResource(R.drawable.delete_button_shape);
@@ -170,6 +175,8 @@ public class CollectionListAdapter extends ArrayAdapter<CollectedLeaf> {
                 try {
                     mCollectionList.remove(mCollectionList.indexOf(mCollectedLeaf));
                     notifyDataSetChanged();
+                    mFragment.setFragmentView();
+                    mFragment.toggleEditButton();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -188,6 +195,30 @@ public class CollectionListAdapter extends ArrayAdapter<CollectedLeaf> {
                 mDbHelper = OpenHelperManager.getHelper(getContext(), DatabaseHelper.class);
             }
             return mDbHelper;
+        }
+    }
+
+    private class LoadItemImageTask extends AsyncTask<Void, Void, Drawable> {
+
+        private CollectedLeaf mCollectedLeaf;
+        private ViewHolder mHolder;
+
+        public LoadItemImageTask(CollectedLeaf collectedLeaf, ViewHolder holder) {
+            mCollectedLeaf = collectedLeaf;
+            mHolder = holder;
+        }
+
+        @Override
+        protected Drawable doInBackground(Void... arg0) {
+            return MediaUtils.getDrawableFromExternalStorage(getContext(),
+                    mCollectedLeaf.getOriginalImageURL().getRawURL());
+        }
+
+        @Override
+        protected void onPostExecute(Drawable drawable) {
+            if (drawable != null) {
+                mHolder.image.setImageDrawable(drawable);
+            }
         }
     }
 }

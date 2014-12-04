@@ -161,4 +161,17 @@ public class CollectedLeaf implements Serializable {
     public enum SyncStatus {
         SERVER_IS_NEWER, SAME, PHONE_IS_NEWER;
     }
+
+    @Override
+    public boolean equals(Object object)
+    {
+        boolean sameSame = false;
+
+        if (object != null && object instanceof CollectedLeaf)
+        {
+            sameSame = this.leafID == ((CollectedLeaf) object).getLeafID();
+        }
+
+        return sameSame;
+    }
 }

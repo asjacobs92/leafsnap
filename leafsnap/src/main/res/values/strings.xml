@@ -64,7 +64,7 @@
     <string name="center_leaf_instr">Center leaf in the frame.</string>
     <string name="gallery">Gallery</string>
     <string name="cancel">Cancel</string>
-    <string name="title_activity_upload_image_activty">UploadImageActivty</string>
+    <string name="title_activity_upload_image_activty">Uploading Image</string>
     <string name="uploading_image">Uploading image.</string>
     <string name="action">Action</string>
     <string name="delete">Delete</string>

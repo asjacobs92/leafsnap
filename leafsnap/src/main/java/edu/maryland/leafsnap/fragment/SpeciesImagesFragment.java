@@ -55,7 +55,7 @@ public class SpeciesImagesFragment extends Fragment {
     public void onStart() {
         super.onStart();
         mImagePicker = (LinearLayout) getActivity().findViewById(R.id.image_picker);
-        new PopulateImagePickerTask().execute();
+        new PopulateImagePickerTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);;
 
     }
 

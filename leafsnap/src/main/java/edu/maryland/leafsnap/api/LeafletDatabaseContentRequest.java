@@ -85,7 +85,7 @@ public class LeafletDatabaseContentRequest {
             Species oneSpecies = new Species(popName, sciName);
             oneSpecies.setDescription(oneJSONSpecies.getString("description"));
 
-            if (result.contains(oneSpecies)) {
+            if (!result.contains(oneSpecies)) {
                 oneSpecies = parseSpeciesData(oneJSONSpecies, oneSpecies);
 
                 JSONObject exampleImages = oneJSONSpecies.getJSONObject("examples");

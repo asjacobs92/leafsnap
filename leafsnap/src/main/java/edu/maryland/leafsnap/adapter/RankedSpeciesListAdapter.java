@@ -2,6 +2,7 @@ package edu.maryland.leafsnap.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.view.LayoutInflater;
@@ -18,6 +19,7 @@ import com.j256.ormlite.android.apptools.OpenHelperManager;
 import java.util.ArrayList;
 
 import edu.maryland.leafsnap.R;
+import edu.maryland.leafsnap.activity.CollectedLeafActivity;
 import edu.maryland.leafsnap.api.LeafletPhotoUploader;
 import edu.maryland.leafsnap.data.DatabaseHelper;
 import edu.maryland.leafsnap.model.CollectedLeaf;
@@ -32,10 +34,12 @@ public class RankedSpeciesListAdapter extends ArrayAdapter<RankedSpecies> {
 
     private boolean mActionButtonVisible = false;
     private LayoutInflater mInflater;
+    private CollectedLeafActivity mActivity;
     private ArrayList<RankedSpecies> mSpeciesList;
 
-    public RankedSpeciesListAdapter(Context context, ArrayList<RankedSpecies> speciesList) {
-        super(context, R.layout.list_item, speciesList);
+    public RankedSpeciesListAdapter(CollectedLeafActivity activity, ArrayList<RankedSpecies> speciesList) {
+        super(activity, R.layout.list_item, speciesList);
+        this.mActivity = activity;
         this.mSpeciesList = speciesList;
     }
 
@@ -73,8 +77,7 @@ public class RankedSpeciesListAdapter extends ArrayAdapter<RankedSpecies> {
         holder.index.setText("" + rankedSpecies.getRank());
         holder.text.setText(species.getCommomName());
         holder.subtext.setText(species.getScientificName());
-        holder.image.setImageDrawable(MediaUtils.getDrawableFromAssets(getContext(),
-                species.getExampleImageLeaf().getRawURL().replace("/species", "species").split("\\?")[0]));
+        new LoadItemImageTask(species, holder).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
         holder.actionButton.setText(getContext().getString(R.string.label));
         holder.actionButton.setBackgroundResource(R.drawable.label_button_shape);
@@ -151,9 +154,35 @@ public class RankedSpeciesListAdapter extends ArrayAdapter<RankedSpecies> {
         protected void onPostExecute(Boolean labelSuccessful) {
             if (labelSuccessful) {
                 notifyDataSetChanged();
-                ((Activity) getContext()).setTitle(mRankedSpecies.getSpecies().getScientificName());
+                mActivity.toggleLabelButton();
+                mActivity.setTitle(mRankedSpecies.getSpecies().getScientificName());
             } else {
                 Toast.makeText(getContext(), R.string.labeling_error, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private class LoadItemImageTask extends AsyncTask<Void, Void, Drawable> {
+
+        private Species mSpecies;
+        private ViewHolder mHolder;
+
+        public LoadItemImageTask(Species species, ViewHolder holder) {
+            mSpecies = species;
+            mHolder = holder;
+        }
+
+        @Override
+        protected Drawable doInBackground(Void... arg0) {
+            return MediaUtils.getDrawableFromAssets(getContext(),
+                    mSpecies.getExampleImageLeaf().getRawURL().replace("/species", "species").split("\\?")[0]);
+
+        }
+
+        @Override
+        protected void onPostExecute(Drawable drawable) {
+            if (drawable != null) {
+                mHolder.image.setImageDrawable(drawable);
             }
         }
     }

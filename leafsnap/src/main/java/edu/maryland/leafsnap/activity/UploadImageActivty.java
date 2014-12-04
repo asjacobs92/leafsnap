@@ -103,7 +103,7 @@ public class UploadImageActivty extends ActionBarActivity implements
     public void onConnectionFailed(ConnectionResult connectionResult) {
         CollectedLeaf c = new CollectedLeaf();
         c.setOriginalImageURL(new LeafletUrl(MediaUtils.getRealPathFromURI(this, mImageUri)));
-        new UploadImageTask(this).execute(c);
+        new UploadImageTask(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, c);
     }
 
     private class UploadImageTask extends AsyncTask<CollectedLeaf, Void, CollectedLeaf> {

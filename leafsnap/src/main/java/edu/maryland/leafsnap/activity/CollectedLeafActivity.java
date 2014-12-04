@@ -79,23 +79,28 @@ public class CollectedLeafActivity extends ActionBarActivity {
                 }
             });
 
-            final Button labelButton = (Button) findViewById(R.id.label_button);
+            Button labelButton = (Button) findViewById(R.id.label_button);
             labelButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (mRankedListAdapter.isActionButtonVisible()) {
-                        mRankedListAdapter.setActionButtonVisible(false);
-                        labelButton.setBackgroundResource(R.drawable.header_button_shape);
-                    } else {
-                        mRankedListAdapter.setActionButtonVisible(true);
-                        labelButton.setBackgroundResource(R.drawable.header_button_shape_toggled);
-                    }
-                    mRankedListAdapter.notifyDataSetChanged();
+                    toggleLabelButton();
                 }
             });
 
             new RankedListTask().execute();
         }
+    }
+
+    public void toggleLabelButton() {
+        Button labelButton = (Button) findViewById(R.id.label_button);
+        if (mRankedListAdapter.isActionButtonVisible()) {
+            mRankedListAdapter.setActionButtonVisible(false);
+            labelButton.setBackgroundResource(R.drawable.header_button_shape);
+        } else {
+            mRankedListAdapter.setActionButtonVisible(true);
+            labelButton.setBackgroundResource(R.drawable.header_button_shape_toggled);
+        }
+        mRankedListAdapter.notifyDataSetChanged();
     }
 
     private class RankedListTask extends AsyncTask<Void, Void, ArrayList<RankedSpecies>> {

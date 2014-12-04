@@ -2,6 +2,7 @@ package edu.maryland.leafsnap.adapter;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
@@ -66,8 +67,7 @@ public class SpeciesListAdapter extends ArrayAdapter<Species> implements StickyL
         Species species = getItem(position);
         holder.text.setText(species.getCommomName());
         holder.subtext.setText(species.getScientificName());
-        holder.image.setImageDrawable(MediaUtils.getDrawableFromAssets(getContext(),
-                species.getExampleImageLeaf().getRawURL().replace("/species", "species").split("\\?")[0]));
+        new LoadItemImageTask(species, holder).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
         return convertView;
     }
@@ -141,6 +141,31 @@ public class SpeciesListAdapter extends ArrayAdapter<Species> implements StickyL
         protected void publishResults(CharSequence constraint, FilterResults results) {
             mSpeciesList = (ArrayList<Species>) results.values;
             notifyDataSetChanged();
+        }
+    }
+
+    private class LoadItemImageTask extends AsyncTask<Void, Void, Drawable> {
+
+        private Species mSpecies;
+        private ViewHolder mHolder;
+
+        public LoadItemImageTask(Species species, ViewHolder holder) {
+            mSpecies = species;
+            mHolder = holder;
+        }
+
+        @Override
+        protected Drawable doInBackground(Void... arg0) {
+            return MediaUtils.getDrawableFromAssets(getContext(),
+                    mSpecies.getExampleImageLeaf().getRawURL().replace("/species", "species").split("\\?")[0]);
+
+        }
+
+        @Override
+        protected void onPostExecute(Drawable drawable) {
+            if (drawable != null) {
+                mHolder.image.setImageDrawable(drawable);
+            }
         }
     }
 }

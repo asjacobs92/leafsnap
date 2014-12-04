@@ -174,6 +174,17 @@ public class Species implements Serializable, Comparable<Species> {
         return -1;
     }
 
+    @Override
+    public boolean equals(Object object) {
+        boolean sameSame = false;
+
+        if (object != null && object instanceof Species) {
+            sameSame = this.getCommomName().contentEquals(((Species) object).getCommomName());
+        }
+
+        return sameSame;
+    }
+
     public ForeignCollection<RankedSpecies> getAssociatedRankedSpecies() {
         return associatedRankedSpecies;
     }

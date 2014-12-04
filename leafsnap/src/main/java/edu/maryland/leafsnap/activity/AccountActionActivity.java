@@ -101,7 +101,7 @@ public class AccountActionActivity extends ActionBarActivity {
     public void onActionButtonClick(View view) {
         HashMap<String, String> user = getUserFromInput();
         if (user != null) {
-            new AccountActionTask().execute(user);
+            new AccountActionTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, user);
         } else {
             Toast.makeText(this, R.string.fill_fields_warning, Toast.LENGTH_SHORT).show();
         }
@@ -143,15 +143,15 @@ public class AccountActionActivity extends ActionBarActivity {
 
         @Override
         protected Boolean doInBackground(HashMap<String, String>... user) {
-            final LeafletUserRegistrationRequest mUserRequest =
+            final LeafletUserRegistrationRequest userRequest =
                     new LeafletUserRegistrationRequest(getBaseContext());
             switch (mAccountAction) {
                 case CREATE:
-                    mUserRequest.registerAccount(user[0].get(KEY_USERNAME), user[0].get(KEY_PASSWORD));
+                    userRequest.registerAccount(user[0].get(KEY_USERNAME), user[0].get(KEY_PASSWORD));
                     break;
                 case UPDATE:
-                    if (mUserRequest.isAccountRegistered()) {
-                        mUserRequest.updateAccount(user[0].get(KEY_USERNAME), user[0].get(KEY_PASSWORD));
+                    if (userRequest.isAccountRegistered()) {
+                        userRequest.updateAccount(user[0].get(KEY_USERNAME), user[0].get(KEY_PASSWORD));
                     } else {
                         runOnUiThread(new Runnable() {
                             @Override
@@ -162,11 +162,11 @@ public class AccountActionActivity extends ActionBarActivity {
                     }
                     break;
                 case VERIFY:
-                    mUserRequest.verifyAccount(user[0].get(KEY_USERNAME), user[0].get(KEY_PASSWORD));
+                    userRequest.verifyAccount(user[0].get(KEY_USERNAME), user[0].get(KEY_PASSWORD));
                     break;
             }
 
-            while (!mUserRequest.isFinished()) {
+            while (!userRequest.isFinished()) {
                 SystemClock.sleep(100);
             }
 
@@ -174,11 +174,11 @@ public class AccountActionActivity extends ActionBarActivity {
                 @Override
                 public void run() {
                     TextView accountStatus = (TextView) findViewById(R.id.account_status);
-                    accountStatus.setText(mUserRequest.getResponseMessage());
+                    accountStatus.setText(userRequest.getResponseMessage());
                 }
             });
 
-            return mUserRequest.wasSuccessful();
+            return userRequest.wasSuccessful();
         }
 
         @Override
@@ -191,7 +191,7 @@ public class AccountActionActivity extends ActionBarActivity {
             mAccountStatusCheckMark.setImageResource(wasSuccessful ? R.drawable.check_right : R.drawable.check_wrong);
 
             if (mAccountAction == AccountAction.VERIFY && wasSuccessful) {
-                new CollectionSyncTask().execute();
+                new CollectionSyncTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }
         }
     }
@@ -207,13 +207,14 @@ public class AccountActionActivity extends ActionBarActivity {
 
         @Override
         protected Void doInBackground(Void... params) {
-            LeafletUserCollectionRequest mCollectionRequest =
+            LeafletUserCollectionRequest collectionRequest =
                     new LeafletUserCollectionRequest(getBaseContext());
-            mCollectionRequest.updateUserCollectionSyncStatus();
-            while (!mCollectionRequest.isFinished()) {
+            collectionRequest.deleteLocalCollection();
+            collectionRequest.updateUserCollectionSyncStatus();
+            while (!collectionRequest.isFinished()) {
                 SystemClock.sleep(100);
             }
-            mCollectionRequest.close();
+            collectionRequest.close();
             return null;
         }
 

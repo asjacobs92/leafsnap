@@ -41,7 +41,6 @@ public class LeafletUserCollectionRequest {
     }
 
     public void updateUserCollectionSyncStatus() {
-        deleteLocalCollection();
         RequestParams params = new RequestParams();
         String username = getSessionManager().getCurrentUser().get(SessionManager.KEY_USERNAME);
         params.put("fmt", "json");
@@ -66,7 +65,7 @@ public class LeafletUserCollectionRequest {
         }, false);
     }
 
-    private void deleteLocalCollection() {
+    public void deleteLocalCollection() {
         try {
             TableUtils.clearTable(getDbHelper().getConnectionSource(), CollectedLeaf.class);
         } catch (SQLException e) {
@@ -74,30 +73,34 @@ public class LeafletUserCollectionRequest {
         }
     }
 
-    private void parseResult(JSONObject result) throws JSONException, SQLException {
-        JSONArray images = result.getJSONArray("images");
+    private void parseResult(JSONObject response) throws JSONException, SQLException {
+        JSONArray images = response.getJSONArray("images");
+        List<CollectedLeaf> result = getDbHelper().getCollectedLeafDao().queryForAll();
         for (int i = 0; i < images.length(); i++) {
             JSONObject oneImage = images.getJSONObject(i);
             CollectedLeaf collectedLeaf = new CollectedLeaf();
 
             collectedLeaf.setSyncStatus(CollectedLeaf.SyncStatus.SAME);
             collectedLeaf.setLeafID(oneImage.getLong("id"));
-            collectedLeaf.setCollectedDate(new Date(oneImage.getLong("phototime") * 1000));
-            collectedLeaf.setLastModified(new Date(oneImage.getLong("lastmodified") * 1000));
 
-            collectedLeaf = parseCollectedLeafAltitude(collectedLeaf, oneImage);
-            collectedLeaf = parseCollectedLeafLatitude(collectedLeaf, oneImage);
-            collectedLeaf = parseCollectedLeafLongitude(collectedLeaf, oneImage);
+            if (!result.contains(collectedLeaf)) {
+                collectedLeaf.setCollectedDate(new Date(oneImage.getLong("phototime") * 1000));
+                collectedLeaf.setLastModified(new Date(oneImage.getLong("lastmodified") * 1000));
 
-            collectedLeaf = parseSelectedSpeciesRel(collectedLeaf, oneImage);
-            collectedLeaf = parseOriginalImageUrl(collectedLeaf);
-            collectedLeaf = parseSegmentedImageUrl(collectedLeaf);
+                collectedLeaf = parseCollectedLeafAltitude(collectedLeaf, oneImage);
+                collectedLeaf = parseCollectedLeafLatitude(collectedLeaf, oneImage);
+                collectedLeaf = parseCollectedLeafLongitude(collectedLeaf, oneImage);
 
-            getDbHelper().getCollectedLeafDao().create(collectedLeaf);
+                collectedLeaf = parseSelectedSpeciesRel(collectedLeaf, oneImage);
+                collectedLeaf = parseOriginalImageUrl(collectedLeaf);
+                collectedLeaf = parseSegmentedImageUrl(collectedLeaf);
 
-            LeafletRecognitionRequest recognitionRequest =
-                    new LeafletRecognitionRequest(mContext, collectedLeaf);
-            recognitionRequest.loadRecognitionResult();
+                getDbHelper().getCollectedLeafDao().create(collectedLeaf);
+
+                LeafletRecognitionRequest recognitionRequest =
+                        new LeafletRecognitionRequest(mContext, collectedLeaf);
+                recognitionRequest.loadRecognitionResult();
+            }
         }
     }
 
