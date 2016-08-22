@@ -1,26 +1,11 @@
 
 #Leafsnap
 
-##Development Environment
-
-The Android version of Leafsnap is an Android Studio project, meaning it was created using the Android Studio IDE and works best on that environment. There are several features embedded on Android Studio that facilitate development a lot, such as the use of Gradle (https://www.gradle.org/) to build and link libraries to use on the project. Gradle uses a Maven based repository to link the libraries, yet also giving the option to link Jar libraries. A very useful tool for using Gradle is [“Gradle, Please”] (http://gradleplease.appspot.com/), where you can find the right dependency for you project.
-
-In addition to that, as all Android projects, Leafsnap can be converted between Android Studio and Eclipse, and that is ultimately the developer’s choice.
-Additional info on how to install and configure Android Studio can be found [here] (http://developer.android.com/sdk/index.html).
-
-In addition to configuring Android Studio, in order to fully test the project, the developer will need to set up a Google Maps key using the computer’s SHA1 key on the project’s Google API Console account. This is a requirement from Google in order to use Google Maps API. More information on how to do this can be found [here] (https://developers.google.com/maps/documentation/android/start#getting_the_google_maps_android_api_v2).
-
-The project is already completely set up to use the Maps API, so the developer will only need to download the required SDK packages and get a key for that specific computer. As shown in the link above, after getting the key, the key on the AndroidManifest.xml file of the project must be changed to the newly acquired key.
-
-The Google Account for the Project is the following:
-	username: leafsnap.umd@gmail.com
-	password:  leafsnap
-
-And the link to the Google Console Dashboard is [here] (https://code.google.com/apis/console/b/0/?noredirect&pli=1#project:166145586216).
+This is the repository for the Android version of the Leafnap App, developed by University of Maryland, in association with Columbia Unvieristy and the Smithsonian Instituion.
 
 ##Project Structure
-The Android studio project has a lot of different folders for configuration and build files that are not really that important for the developer. The really important files are located under *leafsnap/leafsnap/src/main/* and are divided in three main folders:
-*assets/
+The project main files are located under *leafsnap/leafsnap/src/main/* and are divided in three main folders:
+* assets/
 This folder contains all the images for every species in the database of the app (which in the SVN are compressed in a zip file, but must be unzipped for the app to run properly) and the pre-populated SQLite Database that is shipped with the app. It is very important that the database and the images files match, otherwise unexpected Exception will occur at runtime, and may cause the app to crash. Since this files can no longer be altered, only accessed, when the app is running, every database update made within the app will store the images for the new species on a different location within the External Storage of the Android device. In case anyone might want to change the change the pre-populated database and the species list, it must be either done manually or make a script to do it. I initially did it by downloading the images from the Leafsnap database and creating a database within the app and then exporting it so I could ship it pre-populated. Be warned that this process takes a long time, and all images used for this app were scaled down by a factor of three, snce the original images were way too big for any device.
 
 * res/
@@ -34,12 +19,12 @@ The resources folder stores the files for every UI component of the app. Android
   * menu/
     * This folder contains only a couple of UI files for the Action Bar menu of some activities.
   * raw/
-    * This is a very important folder that contains a database configuration file. This app uses Object Relational Mapping Lite (ORM Lite) that provides some lightweight functionality for persisting Java objects to SQL databases. This is very similar to what Hibernate does, however, in a much lighter way, as Android devices can’t deal with all the overhead attached to doing this. Part of avoiding this complexity is the file in this folder *ormlite_config.xml* that gives a quick representation of the database to be persisted. Every time the model for the database are altered, this file must be generated again. This will be explained on a later section.
+    * This folder contains a database configuration file. This app uses Object Relational Mapping Lite (ORM Lite) that provides some lightweight functionality for persisting Java objects to SQL databases. This is very similar to what Hibernate does, however, in a much lighter way, as Android devices can’t deal with all the overhead attached to doing this. Part of avoiding this complexity is the file in this folder *ormlite_config.xml* that gives a quick representation of the database to be persisted. Every time the model for the database are altered, this file must be generated again. This will be explained on a later section.
   * values/
     * This folder contains XML files for values used in the app, such as color Hex codes, strings and dimensions. This is an especially interesting Android feature, since the strings files can be used to easily translate the app to other languages using I18n, in case it is ever pored to other countries.
 
 * java/edu/maryland/leafsnap/
-This is the most important folder, since it contains all the source code for the app. The code is divided in several packages, as shown below.
+This is folder contains all the source code for the app. The code is divided in several packages, as shown below.
   * activity
     * This package contains all the Activities of the app, each one with a corresponding XML file in the resources folder. Basically, each activity is a different “window” in an Android app, which defines the context for app. For more information on Activities, please check this [link] (http://developer.android.com/guide/components/activities.html). This package also contains the entry point of the code, which is the MainActivity.java class.
   * adapter
