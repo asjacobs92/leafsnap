@@ -40,7 +40,8 @@ This is folder contains all the source code for the app. The code is divided in 
   * util
     * Finally, this package some random utility files, such as MediaUtils.java, that has functions used to access External Storage and Assets files, such as all the images for the Species, and the SessionManager.java, used to store the user information.
 
-This concludes the project description. In addition to that, there are several tool I used during development that helped build interfaces, among other things. Below, some of the links for these tools can be found.
+
+Some useful tools used during development:
 
 * http://romannurik.github.io/AndroidAssetStudio/
 * http://androidweekly.net/toolbox
