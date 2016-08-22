@@ -1,7 +1,8 @@
 
 #Leafsnap
 
-This is the repository for the Android version of the Leafnap App, developed by University of Maryland, in association with Columbia Unvieristy and the Smithsonian Instituion.
+This is the repository for the Android version of the Leafnap App. This app is still unpublished.
+Leafsnap is an iOS app developed by University of Maryland, in association with Columbia Unvieristy and the Smithsonian Instituion.
 
 ##Project Structure
 The project main files are located under *leafsnap/leafsnap/src/main/* and are divided in three main folders:
