@@ -6,10 +6,10 @@ Leafsnap is an iOS app developed by University of Maryland, in association with 
 
 ##Project Structure
 The project main files are located under *leafsnap/leafsnap/src/main/* and are divided in three main folders:
-* assets/
+* assets/ <br/>
 This folder contains all the images for every species in the database of the app (which in the SVN are compressed in a zip file, but must be unzipped for the app to run properly) and the pre-populated SQLite Database that is shipped with the app. It is very important that the database and the images files match, otherwise unexpected Exception will occur at runtime, and may cause the app to crash. Since this files can no longer be altered, only accessed, when the app is running, every database update made within the app will store the images for the new species on a different location within the External Storage of the Android device. In case anyone might want to change the change the pre-populated database and the species list, it must be either done manually or make a script to do it. I initially did it by downloading the images from the Leafsnap database and creating a database within the app and then exporting it so I could ship it pre-populated. Be warned that this process takes a long time, and all images used for this app were scaled down by a factor of three, snce the original images were way too big for any device.
 
-* res/
+* res/ <br/>
 The resources folder stores the files for every UI component of the app. Android development uses XML files to represent interfaces, but there is a visual editor that helps build the interfaces. However animation and shapes must be done by coding. The structure of this folder is as follows:
   * anim/
     * This folder contains the XML files for animations within the app, such as the flip card transition used to switch between a species images and description.
@@ -24,7 +24,7 @@ The resources folder stores the files for every UI component of the app. Android
   * values/
     * This folder contains XML files for values used in the app, such as color Hex codes, strings and dimensions. This is an especially interesting Android feature, since the strings files can be used to easily translate the app to other languages using I18n, in case it is ever pored to other countries.
 
-* java/edu/maryland/leafsnap/
+* java/edu/maryland/leafsnap/ <br/>
 This is folder contains all the source code for the app. The code is divided in several packages, as shown below.
   * activity
     * This package contains all the Activities of the app, each one with a corresponding XML file in the resources folder. Basically, each activity is a different “window” in an Android app, which defines the context for app. For more information on Activities, please check this [link] (http://developer.android.com/guide/components/activities.html). This package also contains the entry point of the code, which is the MainActivity.java class.
