@@ -48,6 +48,7 @@ Some useful tools used during development:
 * http://androidweekly.net/toolbox
 
 
+<br/>
 Arthur Jacobs<br/>
 asjacobs@inf.ufrgs.br<br/>
 Computer Science Undergraduate Student<br/>
