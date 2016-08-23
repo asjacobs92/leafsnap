@@ -48,5 +48,11 @@ Some useful tools used during development:
 * http://androidweekly.net/toolbox
 
 
+Arthur Jacobs<br/>
+asjacobs@inf.ufrgs.br<br/>
+Computer Science Undergraduate Student<br/>
+Federeal University of Rio Grande do Sul<br/>
+
+
 
 
